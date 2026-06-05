@@ -1,0 +1,8 @@
+.App{
+    min-height: 100vh;
+    display: flex;
+    background-image: url("./chat\ background.jpg");
+    background-size: cover;
+    background-position: center;
+    opacity: 0.9;
+}

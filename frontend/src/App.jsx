@@ -2,10 +2,13 @@ import "./App.css";
 import { Routes, Route } from "react-router-dom";
 import HomePage from "./Pages/HomePage";
 import ChatPage from "./Pages/ChatPage";
+import "./App.css"
+import Navbar from "./Pages/Navbar";
 
 function App() {
   return (
     <div className="App">
+      <Navbar />
       <Routes>
         <Route path="/" element={<HomePage />} exact />
         <Route path="/chats" element={<ChatPage />} />
