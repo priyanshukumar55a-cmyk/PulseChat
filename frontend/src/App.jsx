@@ -1,18 +1,16 @@
+import { Outlet } from "react-router-dom";
 import "./App.css";
-import { Routes, Route } from "react-router-dom";
-import HomePage from "./Pages/HomePage";
-import ChatPage from "./Pages/ChatPage";
-import "./App.css"
 import Navbar from "./Pages/Navbar";
+import Background from "./Pages/Background";
 
 function App() {
   return (
-    <div className="App">
+    <div className="App min-h-screen bg-cover bg-center bg-no-repeat">
+      <Background />
       <Navbar />
-      <Routes>
-        <Route path="/" element={<HomePage />} exact />
-        <Route path="/chats" element={<ChatPage />} />
-      </Routes>
+      <div className="">
+        <Outlet />
+      </div>
     </div>
   );
 }
