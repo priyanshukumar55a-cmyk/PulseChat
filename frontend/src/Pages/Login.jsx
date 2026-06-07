@@ -1,10 +1,41 @@
 import { useState } from "react";
 import { Eye, EyeOff, Mail, Lock, MessageCircle } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Form, Link } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
+import { toast } from "sonner";
+import axios from "axios";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState({
+    email: "",
+    password:"",
+  })
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log("Submit clicked");
+  
+      try {
+        const res = await axios.post("http://localhost:3001/api/user/login", {
+          email: formData.email,
+          password: formData.password,
+        });
+        
+        toast.success("Login Successfull")
+        console.log(res.data);
+      } catch (err) {
+        toast.error("Error Occured!");
+        console.error(err.response?.data || err.message);
+      }
+    };
 
   return (
     <div className="relative min-h-screen flex items-center justify-center px-4 pt-25 pb-10">
@@ -25,7 +56,7 @@ export default function Login() {
           </div>
 
           {/* Form */}
-          <form className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-5">
             {/* Email */}
             <div>
               <label className="block text-sm text-white/80 mb-2">Email</label>
@@ -34,6 +65,10 @@ export default function Login() {
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50 w-5 h-5" />
 
                 <input
+                  required
+                  name="email"
+                  onChange={handleChange}
+                  value={formData.email}
                   type="email"
                   placeholder="Enter your email"
                   className="w-full pl-12 pr-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder:text-white/60 outline-none focus:ring-2 focus:ring-indigo-500"
@@ -51,6 +86,10 @@ export default function Login() {
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50 w-5 h-5" />
 
                 <input
+                  required
+                  name="password"
+                  onChange={handleChange}
+                  value={formData.password}
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter your password"
                   className="w-full pl-12 pr-12 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder:text-white/60 outline-none focus:ring-2 focus:ring-indigo-500"

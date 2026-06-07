@@ -2,10 +2,49 @@ import { useState } from "react";
 import { Eye, EyeOff, Mail, Lock, User, MessageCircle } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
 import { Link } from "react-router-dom";
+import axios from "axios";
+import { toast, Toaster } from "sonner";
 
 export default function Signup() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (formData.password !== formData.confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
+    try {
+      const res = await axios.post("http://localhost:3001/api/user/register", {
+        username: formData.name,
+        email: formData.email,
+        password: formData.password,
+      });
+      
+      toast.success("Registration Successfull")
+      console.log(res.data);
+    } catch (err) {
+      toast.error("Error Occured!");
+      console.error(err.response?.data || err.message);
+    }
+  };
 
   return (
     <div className="relative min-h-screen flex items-center justify-center px-4 pt-24 pb-10">
@@ -43,19 +82,21 @@ export default function Signup() {
             </p>
           </div>
 
-          <form className="space-y-5">
+          <form className="space-y-5" onSubmit={handleSubmit}>
             {/* Name */}
             <div>
-              <label className="block text-sm text-white mb-2">
-                Full Name
-              </label>
+              <label className="block text-sm text-white mb-2">Full Name</label>
 
               <div className="relative">
                 <User className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50 w-5 h-5" />
 
                 <input
+                  required
                   type="text"
                   placeholder="Enter your name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
                   className="
                     w-full
                     pl-12 pr-4 py-3
@@ -80,8 +121,12 @@ export default function Signup() {
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50 w-5 h-5" />
 
                 <input
+                  required
                   type="email"
                   placeholder="Enter your email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
                   className="
                     w-full
                     pl-12 pr-4 py-3
@@ -108,8 +153,12 @@ export default function Signup() {
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50 w-5 h-5" />
 
                 <input
+                  required
                   type={showPassword ? "text" : "password"}
                   placeholder="Create a password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
                   className="
                     w-full
                     pl-12 pr-12 py-3
@@ -148,8 +197,12 @@ export default function Signup() {
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50 w-5 h-5" />
 
                 <input
+                  required
                   type={showConfirmPassword ? "text" : "password"}
+                  name="confirmPassword"
                   placeholder="Confirm password"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
                   className="
                     w-full
                     pl-12 pr-12 py-3
@@ -180,7 +233,7 @@ export default function Signup() {
 
             {/* Terms */}
             <label className="flex items-start gap-2 text-sm text-white/70 hover:cursor-pointer">
-              <input type="checkbox" className="mt-1 accent-indigo-500" />
+              <input required type="checkbox" className="mt-1 accent-indigo-500" />
 
               <span>
                 I agree to the{" "}
