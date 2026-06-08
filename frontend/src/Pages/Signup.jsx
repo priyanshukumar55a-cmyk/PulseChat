@@ -2,11 +2,22 @@ import { useState, useEffect } from "react";
 import { Eye, EyeOff, Mail, Lock, User, MessageCircle, Loader2 } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
 import { toast } from "sonner";
+import { registerUser } from "@/services/authService";
+
+const NAME_REGEX = /^[A-Za-z ]+$/;
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const INITIAL_FORM = {
+  name: "",
+  email: "",
+  password: "",
+  confirmPassword: "",
+};
 
 export default function Signup() {
   const navigate = useNavigate();
+
   useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -14,16 +25,12 @@ export default function Signup() {
       document.body.style.overflow = prev;
     };
   }, []);
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
+  const [formData, setFormData] = useState(INITIAL_FORM);
 
   const password = formData.password;
   const passwordChecks = {
@@ -36,56 +43,62 @@ export default function Signup() {
 
   const isPasswordValid = Object.values(passwordChecks).every(Boolean);
 
+  const requirements = [
+    ["length", "8+ chars"],
+    ["uppercase", "Uppercase"],
+    ["lowercase", "Lowercase"],
+    ["number", "Number"],
+    ["special", "Special"],
+  ];
+
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
+
+  const validateForm=() => {
+    if (formData.password !== formData.confirmPassword) {
+      toast.error("Passwords do not match!");
+      return false;
+    }
+
+    if (!NAME_REGEX.test(formData.name)) {
+      toast.error("Name can only contain letters");
+      return false;
+    }
+
+    if (!EMAIL_REGEX.test(formData.email)) {
+      toast.error("Please enter a valid email address");
+      return false;
+    }
+
+    return true;
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (formData.password !== formData.confirmPassword) {
-      toast.error("Passwords do not match!");
-      return;
-    }
-
-    const nameRegex = /^[A-Za-z ]+$/;
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (!nameRegex.test(formData.name)) {
-      toast.error("Name can only contain letters");
-      return;
-    }
-
-    if (!emailRegex.test(formData.email)) {
-      toast.error("Please enter a valid email address");
-      return;
-    }
-
+    if (!validateForm()) return;
     try {
       setLoading(true);
-      const res = await axios.post("http://localhost:3001/api/user/register", {
+      await registerUser({
         username: formData.name,
         email: formData.email,
         password: formData.password,
       });
 
-      toast.success("Registration Successfull!");
-      setFormData({
-        name: "",
-        email: "",
-        password: "",
-        confirmPassword: "",
-      });
-      setTimeout(() => {
-        navigate("/login");
-      }, 1500);
+      toast.success("Registration Successful!");
+      navigate("/login");
     } catch (err) {
-      toast.error("Error Occured!");
+      toast.error(
+        err.response?.data?.message || err.message || "Something went wrong",
+      );
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   };
 
@@ -192,42 +205,17 @@ export default function Signup() {
                 </div>
               </div>
 
-              <div className="md:col-span-2 mt-3 grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
-                <p
-                  className={
-                    passwordChecks.length ? "text-green-400" : "text-red-400"
-                  }
-                >
-                  {passwordChecks.length ? "✓" : "✗"} 8+ chars
-                </p>
-                <p
-                  className={
-                    passwordChecks.uppercase ? "text-green-400" : "text-red-400"
-                  }
-                >
-                  {passwordChecks.uppercase ? "✓" : "✗"} Uppercase
-                </p>
-                <p
-                  className={
-                    passwordChecks.lowercase ? "text-green-400" : "text-red-400"
-                  }
-                >
-                  {passwordChecks.lowercase ? "✓" : "✗"} Lowercase
-                </p>
-                <p
-                  className={
-                    passwordChecks.number ? "text-green-400" : "text-red-400"
-                  }
-                >
-                  {passwordChecks.number ? "✓" : "✗"} Number
-                </p>
-                <p
-                  className={
-                    passwordChecks.special ? "text-green-400" : "text-red-400"
-                  }
-                >
-                  {passwordChecks.special ? "✓" : "✗"} Special
-                </p>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs md:mt-8">
+                {requirements.map(([key, label]) => (
+                  <p
+                    key={key}
+                    className={
+                      passwordChecks[key] ? "text-green-400" : "text-red-400"
+                    }
+                  >
+                    {passwordChecks[key] ? "✓" : "✗"} {label}
+                  </p>
+                ))}
               </div>
 
               {/* Confirm Password */}
@@ -278,11 +266,11 @@ export default function Signup() {
               </div>
 
               {/* Signup Button */}
-                <button
-                  type="submit"
-                  disabled={!isPasswordValid || loading}
-                  className={`w-full md:col-span-2 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold hover:scale-[1.02] hover:shadow-[0_0_25px_rgba(139,92,246,0.5)] transition-all duration-300 ${isPasswordValid ? "hover:scale-[1.02] hover:cursor-pointer" : " cursor-not-allowed opacity-60"}`}
-                >
+              <button
+                type="submit"
+                disabled={!isPasswordValid || loading}
+                className={`w-full md:col-span-2 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold hover:scale-[1.02] hover:shadow-[0_0_25px_rgba(139,92,246,0.5)] transition-all duration-300 ${isPasswordValid ? "hover:scale-[1.02] hover:cursor-pointer" : " cursor-not-allowed opacity-60"}`}
+              >
                 {loading ? (
                   <div className="justify-center flex items-center gap-3">
                     <Loader2 className="h-5 w-5 animate-spin" />

@@ -3,10 +3,13 @@ import { Eye, EyeOff, Mail, Lock, MessageCircle } from "lucide-react";
 import {  Link, useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
 import { toast } from "sonner";
-import axios from "axios";
 import { Loader2 } from "lucide-react";
+import { loginUser } from "@/services/authService";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Login() {
+  const { login } = useAuth();
+  
   const navigate = useNavigate();
   useEffect(() => {
     const prev = document.body.style.overflow;
@@ -16,6 +19,7 @@ export default function Login() {
     };
   }, []);
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password:"",
@@ -34,21 +38,23 @@ export default function Login() {
     setLoading(true)
   
       try {
-        const res = await axios.post("http://localhost:3001/api/user/login", {
+        const res = await loginUser({
           email: formData.email,
           password: formData.password,
+          rememberMe,
         });
 
         toast.success("Login Successfull!");
         // Store token if using JWT
-        localStorage.setItem("token", res.data.token);
-        navigate("/");
+        login(res.data)
         console.log(res.data);
+        navigate("/");
       } catch (err) {
-        toast.error("Error Occured!");
-        console.error(err.response?.data || err.message);
+        toast.error(
+          err.response?.data?.message || err.message || "Something went wrong",
+        );
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     };
 
@@ -133,6 +139,8 @@ export default function Login() {
                 <label className="flex items-center gap-2 text-white/70 hover:cursor-pointer">
                   <input
                     type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
                     className="rounded border-white/20 hover:cursor-pointer text-indigo-500 focus:ring-indigo-500"
                   />
                   Remember me

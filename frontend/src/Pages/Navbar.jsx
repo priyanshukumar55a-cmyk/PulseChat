@@ -1,9 +1,18 @@
 import { useState } from "react";
 import { Menu, X, MessageCircle } from "lucide-react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Navbar() {
+  const { isAuthenticated, logout } = useAuth();
+  
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout()
+    navigate("/login");
+  };
 
   const navLinkClass = ({ isActive }) =>
     `relative transition-all duration-300 hover:text-white
@@ -56,19 +65,30 @@ export default function Navbar() {
 
           {/* Desktop Buttons */}
           <div className="hidden md:flex items-center gap-3">
-            <Link
-              to="/login"
-              className="px-5 py-2 rounded-xl border border-white/20 text-white hover:bg-white/10 hover:-translate-y-0.5 transition-all duration-300"
-            >
-              Login
-            </Link>
+            {!isAuthenticated ? (
+              <>
+                <Link
+                  to="/login"
+                  className="px-5 py-2 rounded-xl border border-white/20 text-white hover:bg-white/10 hover:-translate-y-0.5 transition-all duration-300"
+                >
+                  Login
+                </Link>
 
-            <Link
-              to="/signup"
-              className="px-5 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium hover:scale-105 transition-all duration-300 shadow-lg"
-            >
-              Sign Up
-            </Link>
+                <Link
+                  to="/signup"
+                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium hover:scale-105 transition-all duration-300 shadow-lg"
+                >
+                  Sign Up
+                </Link>
+              </>
+            ) : (
+              <button
+                onClick={handleLogout}
+                className="px-4 py-2 rounded-xl border border-white/20 text-white hover:bg-white/10 transition-all duration-300"
+              >
+                Logout
+              </button>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -119,21 +139,35 @@ export default function Navbar() {
             </a>
 
             <div className="flex flex-col gap-3 pt-2">
-              <Link
-                to="/login"
-                onClick={() => setIsOpen(false)}
-                className="px-5 py-2 rounded-xl border border-white/20 text-white hover:bg-white/10 hover:border-indigo-400/50 transition-all duration-300 text-center shadow-lg"
-              >
-                Login
-              </Link>
+              {!isAuthenticated ? (
+                <>
+                  <Link
+                    to="/login"
+                    onClick={() => setIsOpen(false)}
+                    className="px-5 py-2 rounded-xl border border-white/20 text-white hover:bg-white/10 hover:border-indigo-400/50 transition-all duration-300 text-center shadow-lg"
+                  >
+                    Login
+                  </Link>
 
-              <Link
-                to="/signup"
-                onClick={() => setIsOpen(false)}
-                className="px-5 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-center shadow-lg"
-              >
-                Sign Up
-              </Link>
+                  <Link
+                    to="/signup"
+                    onClick={() => setIsOpen(false)}
+                    className="px-5 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-center shadow-lg"
+                  >
+                    Sign Up
+                  </Link>
+                </>
+              ) : (
+                <button
+                  onClick={() => {
+                    setIsOpen(false);
+                    handleLogout();
+                  }}
+                  className="px-5 py-2 rounded-xl border border-white/20 text-white hover:bg-white/10 hover:border-indigo-400/50 transition-all duration-300 text-center shadow-lg"
+                >
+                  Logout
+                </button>
+              )}
             </div>
           </div>
         </div>
