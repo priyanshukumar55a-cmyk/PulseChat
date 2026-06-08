@@ -5,10 +5,12 @@ const app = express();
 const server = http.createServer(app);
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
-const authRouter = require('./Routes/userRoutes');
+const authRouter = require('./routes/authRoutes');
 const cors = require("cors");
 
 const { notFound, errorHandler } = require('./middlewares/errorMiddleware');
+const userRouter = require('./Routes/userRoutes');
+const chatRoutes = require('./routes/chatRoutes');
 require('colors');
 dotenv.config();
 
@@ -20,6 +22,8 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/api/user", authRouter);
+app.use('/api/user', userRouter)
+app.use("/api/chat", chatRoutes)
 
 app.use(notFound);
 app.use(errorHandler)

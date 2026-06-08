@@ -12,9 +12,7 @@ function App() {
         <Toaster richColors position="top-right" />
         <Background />
         <Navbar />
-        <div className="">
           <Outlet />
-        </div>
       </div>
     </AuthProvider>
   );

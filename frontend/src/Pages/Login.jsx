@@ -9,7 +9,7 @@ import { useAuth } from "@/context/AuthContext";
 
 export default function Login() {
   const { login } = useAuth();
-  
+
   const navigate = useNavigate();
   useEffect(() => {
     const prev = document.body.style.overflow;
@@ -45,8 +45,7 @@ export default function Login() {
         });
 
         toast.success("Login Successfull!");
-        // Store token if using JWT
-        login(res.data)
+        login(res.data)  // save in AuthContext
         console.log(res.data);
         navigate("/");
       } catch (err) {

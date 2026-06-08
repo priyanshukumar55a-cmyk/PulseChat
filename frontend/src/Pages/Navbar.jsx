@@ -5,7 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 
 export default function Navbar() {
   const { isAuthenticated, logout } = useAuth();
-  
+
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -45,21 +45,21 @@ export default function Navbar() {
               href="#features"
               className="text-white/80 hover:text-white hover:-translate-y-0.5 transition-all duration-300"
             >
-              Features
+              Chats
             </a>
 
             <a
               href="#technology"
               className="text-white/80 hover:text-white hover:-translate-y-0.5 transition-all duration-300"
             >
-              Technology
+              Profile
             </a>
 
             <a
               href="#contact"
               className="text-white/80 hover:text-white hover:-translate-y-0.5 transition-all duration-300"
             >
-              Contact
+              Settings
             </a>
           </div>
 
@@ -119,7 +119,7 @@ export default function Navbar() {
               onClick={() => setIsOpen(false)}
               className="text-white/80 hover:text-white transition font-medium"
             >
-              Features
+              Chats
             </a>
 
             <a
@@ -127,7 +127,7 @@ export default function Navbar() {
               onClick={() => setIsOpen(false)}
               className="text-white/80 hover:text-white transition font-medium"
             >
-              Technology
+              Profile
             </a>
 
             <a
@@ -135,7 +135,7 @@ export default function Navbar() {
               onClick={() => setIsOpen(false)}
               className="text-white/80 hover:text-white transition font-medium"
             >
-              Contact
+              Settings
             </a>
 
             <div className="flex flex-col gap-3 pt-2">
