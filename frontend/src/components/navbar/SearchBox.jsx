@@ -1,6 +1,7 @@
 import React, { useRef, useState } from "react";
 import api from "@/api/axios";
 import { Search } from "lucide-react";
+import UserListItem from "@/UserAvatar/UserListItem";
 
 const SearchBox = () => {
   const [search, setSearch] = useState("");
@@ -45,7 +46,7 @@ const SearchBox = () => {
           value={search}
           onChange={handleSearchChange}
           placeholder="Search users..."
-          className="w-full px-3 py-2 rounded-xl bg-white/5 text-white placeholder:text-white/50 border border-white/10 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
+          className="w-full px-3 py-2 rounded-xl bg-white/5 text-white placeholder:text-white/50 border border-white/10 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all duration-300"
         />
         <div className="p-2 rounded-lg bg-indigo-600 text-white hidden sm:inline-flex">
           <Search size={16} />
@@ -53,22 +54,27 @@ const SearchBox = () => {
       </div>
 
       {/* Dropdown results */}
-      {(results.length > 0 || loadingSearch) && (
-        <div className="absolute top-full left-0 mt-2 w-full bg-black/60 border border-white/10 rounded-lg p-2 z-50">
+      {search && (
+        <div className="absolute top-full left-0 mt-2 w-86 bg-black/60 border border-white/10 rounded-lg p-2 z-50">
           {loadingSearch ? (
             <div className="text-sm text-white/70 p-2">Searching...</div>
-          ) : (
+          ) : results.length > 0 ? (
             results.slice(0, 6).map((u) => (
-              <button
+              <div
                 key={u._id || u.id}
-                onClick={() => handleSelectUser(u)}
                 className="w-full text-left px-2 py-2 hover:bg-white/5 rounded"
               >
-                <div className="text-sm text-white">
-                  {u.username || u.name || u.email}
-                </div>
-              </button>
+                <UserListItem
+                  key={u._id || u.id}
+                  user={u}
+                  handleFunction={() => handleSelectUser(u)}
+                ></UserListItem>
+              </div>
             ))
+          ) : (
+            <div className="text-sm text-white/60 p-2 text-center">
+              No users found
+            </div>
           )}
         </div>
       )}
