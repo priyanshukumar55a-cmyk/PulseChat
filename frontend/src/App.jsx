@@ -10,14 +10,14 @@ function App() {
 
   return (
     <AuthProvider>
-      {/* <ChatProvider> */}
-        <div className="App min-h-screen bg-cover bg-center bg-no-repeat">
+      <ChatProvider>
+        <div className="App h-[calc(100vh-5rem)] bg-cover bg-center bg-no-repeat">
           <Toaster richColors position="top-right" />
           <Background />
           <Navbar />
           <Outlet />
         </div>
-      {/* </ChatProvider> */}
+      </ChatProvider>
     </AuthProvider>
   );
 }

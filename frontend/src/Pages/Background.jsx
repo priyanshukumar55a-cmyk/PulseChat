@@ -1,8 +1,6 @@
 import React from "react";
 import bgImage from "../assets/chat-background.jpg";
 
-console.log(bgImage);
-
 const Background = () => {
   return (
     <div className="fixed inset-0 -z-10">

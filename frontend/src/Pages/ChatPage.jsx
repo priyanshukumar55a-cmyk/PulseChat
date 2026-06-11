@@ -1,19 +1,26 @@
 import { useAuth } from "@/context/AuthContext";
 import ChatBox from "@/miscellaneous/ChatBox";
 import Mychats from "@/miscellaneous/Mychats";
-import SideDrawer from "@/miscellaneous/SideDrawer";
 import React, { useEffect } from "react";
 
 const ChatPage = () => {
   const { user } = useAuth();
 
-  return <div style={{ width: "100%" }}>
-    {user && <SideDrawer/>}
-    <div className="flex justify-between w-full h-full p-10">
-      {user && <Mychats/>}
-      {user && <ChatBox/>}
+  return (
+    <div className="mt-18 h-[calc(100vh-4.5rem)] flex gap-3 px-3">
+      {user && (
+        <>
+          <div className="w-full md:w-[350px] lg:w-[400px] flex-shrink-0">
+            <Mychats />
+          </div>
+
+          <div className="flex-1 min-w-0">
+            <ChatBox />
+          </div>
+        </>
+      )}
     </div>
-  </div>;
+  );
 };
 
 export default ChatPage;

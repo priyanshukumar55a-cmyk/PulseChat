@@ -1,34 +1,34 @@
-import React from 'react'
+import React from "react";
+import { MessageCircle } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import defaultAvatar from "../assets/default-avatar.png";
-import { MessageCircle } from 'lucide-react';
 
-
-const UserListItem = ({user, handleFunction }) => {
+const UserListItem = ({ user }) => {
   return (
-    <button
-      onClick={handleFunction}
-      className="bg-gray-800 w-full flex items-center gap-3 p-3 rounded-2xl hover:bg-gray-700 transition-all duration-300 group hover:cursor-pointer"
-    >
+    <div className="w-full flex items-center gap-3 p-3 rounded-2xl transition-all duration-300 group">
       <Avatar className="h-11 w-11 border border-white/10">
         <AvatarImage src={user?.pic || defaultAvatar} />
-        <AvatarFallback>{user?.username?.[0]?.toUpperCase()}</AvatarFallback>
+        <AvatarFallback>
+          {user?.username?.[0]?.toUpperCase() || "U"}
+        </AvatarFallback>
       </Avatar>
 
-      <div className="flex-1 text-left">
-        <p className="font-medium text-white group-hover:text-indigo-300 transition-colors">
-          {user.username}
+      <div className="flex-1 min-w-0 text-left">
+        <p className="font-medium text-white group-hover:text-indigo-500 transition-colors ">
+          {user?.username}
         </p>
 
-        <p className="text-xs text-white/50 truncate">{user.email}</p>
+        <p className="text-xs text-white/60 truncate group-hover:text-indigo-400">
+          {user?.email}
+        </p>
       </div>
 
       <MessageCircle
         size={18}
-        className="text-white/40 group-hover:text-indigo-400 transition-colors"
+        className="shrink-0 text-white/40 group-hover:text-indigo-400 transition-colors"
       />
-    </button>
+    </div>
   );
-}
+};
 
-export default UserListItem
+export default UserListItem;

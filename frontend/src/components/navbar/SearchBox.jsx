@@ -1,13 +1,32 @@
 import React, { useRef, useState } from "react";
 import api from "@/api/axios";
-import { Search } from "lucide-react";
+import { Search, X, Loader2 } from "lucide-react";
 import UserListItem from "@/UserAvatar/UserListItem";
 
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
+import {
+  Command,
+  CommandEmpty,
+  CommandList,
+} from "@/components/ui/command";
+import {useChatAccess} from "./useChatAccess";
+import { useNavigate } from "react-router-dom";
+
 const SearchBox = () => {
+  const navigate = useNavigate()
+  const { accessChat, loadingChat } = useChatAccess();
+
   const [search, setSearch] = useState("");
   const [results, setResults] = useState([]);
   const [loadingSearch, setLoadingSearch] = useState(false);
   const debounceRef = useRef(null);
+  const inputRef = useRef(null);
+  const [focused, setFocused] = useState(false);
 
   const handleSearchChange = (e) => {
     const val = e.target.value;
@@ -33,52 +52,93 @@ const SearchBox = () => {
     }, 350);
   };
 
-  const handleSelectUser = (user) => {
+  const handleClear = () => {
     setSearch("");
     setResults([]);
-    // navigate to chat or profile with user id; placeholder navigates to /profile
-    navigate(`/profile/${user._id || user.id}`);
   };
-  return (
-    <div className="hidden sm:flex items-center mx-6 w-96 relative">
-      <div className="flex items-center w-full gap-2">
-        <input
-          value={search}
-          onChange={handleSearchChange}
-          placeholder="Search users..."
-          className="w-full px-3 py-2 rounded-xl bg-white/5 text-white placeholder:text-white/50 border border-white/10 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all duration-300"
-        />
-        <div className="p-2 rounded-lg bg-indigo-600 text-white hidden sm:inline-flex">
-          <Search size={16} />
-        </div>
-      </div>
 
-      {/* Dropdown results */}
-      {search && (
-        <div className="absolute top-full left-0 mt-2 w-86 bg-black/60 border border-white/10 rounded-lg p-2 z-50">
-          {loadingSearch ? (
-            <div className="text-sm text-white/70 p-2">Searching...</div>
-          ) : results.length > 0 ? (
-            results.slice(0, 6).map((u) => (
-              <div
-                key={u._id || u.id}
-                className="w-full text-left px-2 py-2 hover:bg-white/5 rounded"
+  const handleSelectUser = async (user) => {
+    setSearch("");
+    setResults([]); 
+    await accessChat(user._id || user.id) ;
+    navigate("/chats")
+  };
+  const open = search.trim().length > 0;
+
+  return (
+    <Popover open={open}>
+      <div className="hidden sm:flex items-center mx-6 w-96">
+        <PopoverTrigger asChild>
+          <div className="flex items-center w-full gap-2">
+            <div className="relative flex-1">
+              <input
+                ref={inputRef}
+                value={search}
+                onChange={handleSearchChange}
+                onFocus={() => setFocused(true)}
+                onBlur={() => setFocused(false)}
+                placeholder="Search by name or email"
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck={false}
+                className="w-full pr-9 px-3 py-2 rounded-xl bg-white/5 text-white placeholder:text-white/50 border border-white/10 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all duration-300"
+              />
+
+              {/* Clear button: visible when input has text or when focused */}
+              <button
+                type="button"
+                onClick={handleClear}
+                aria-label="Clear search"
+                className={`absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-md text-white/60 hover:text-white transition-opacity duration-150 ${
+                  search.trim().length > 0 || focused
+                    ? "opacity-100"
+                    : "opacity-0 pointer-events-none"
+                }`}
               >
-                <UserListItem
-                  key={u._id || u.id}
-                  user={u}
-                  handleFunction={() => handleSelectUser(u)}
-                ></UserListItem>
-              </div>
-            ))
-          ) : (
-            <div className="text-sm text-white/60 p-2 text-center">
-              No users found
+                <X size={14} />
+              </button>
             </div>
-          )}
-        </div>
-      )}
-    </div>
+
+            <div className="p-2 rounded-lg bg-indigo-600 text-white hidden sm:inline-flex">
+              {loadingChat || loadingSearch ? (
+                <Loader2 className="animate-spin" size={16} />
+              ) : (
+                <Search size={16} />
+              )}
+            </div>
+          </div>
+        </PopoverTrigger>
+
+        <PopoverContent
+          align="start"
+          className="w-96 p-2 bg-black/80 backdrop-blur-xl border border-white/10"
+        >
+          <Command className="bg-transparent">
+            <CommandList>
+              {loadingSearch ? (
+                <div className="p-3 text-sm text-white/70">Searching...</div>
+              ) : results.length > 0 ? (
+                results.slice(0, 6).map((u) => (
+                  <div
+                    key={u._id || u.id}
+                    value={`${u.username} ${u.email}`}
+                    onClick={() => handleSelectUser(u)}
+                    className="cursor-pointer p-0 m-2 rounded-xl bg-white/5 hover:bg-amber-300"
+                  >
+                    <UserListItem user={u} />
+                  </div>
+                ))
+              ) : (
+                <CommandEmpty className={"text-white"}>
+                  No users found
+                </CommandEmpty>
+              )}
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </div>
+    </Popover>
   );
 };
 
