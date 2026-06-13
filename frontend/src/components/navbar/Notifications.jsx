@@ -53,11 +53,11 @@ export default function Notifications() {
         align="end"
         className="w-80 bg-black/65 backdrop-blur-xl border border-white/10 text-white"
       >
-          <DropdownMenuLabel className="text-[14px] text-white/60 text-center">
-            Notifications
-          </DropdownMenuLabel>
+        <DropdownMenuLabel className="text-[15px] text-white/60 text-center">
+          Notifications
+        </DropdownMenuLabel>
 
-        <DropdownMenuSeparator />
+        <DropdownMenuSeparator className={"bg-white w-auto h-0.5"} />
 
         {notifications.length === 0 ? (
           <div className="p-4 text-sm text-white/60">No new notifications</div>
@@ -66,7 +66,7 @@ export default function Notifications() {
             <DropdownMenuItem
               key={notification.id}
               onClick={() => handleNotificationClick(notification)}
-              className="cursor-pointer"
+              className="cursor-pointer p-2"
             >
               {notification.message}
             </DropdownMenuItem>

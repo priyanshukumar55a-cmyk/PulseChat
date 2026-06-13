@@ -19,14 +19,14 @@ const MySingleChat = ({ chat, user, isSelected, setSelectedChat }) => {
   return (
     <button
       onClick={() => setSelectedChat(chat)}
-      className={`group w-full flex items-center gap-4 p-3 rounded-2xl text-left
+      className={`group w-full flex items-center gap-4 px-3 rounded-2xl text-left py-2.5
     transition-all duration-300 border ${
       isSelected
-        ? "bg-gradient-to-r from-violet-600 to-fuchsia-600 border-violet-400 shadow-lg shadow-violet-500/30 scale-[1.02]"
+        ? "bg-gradient-to-r from-violet-600 to-fuchsia-600 border-violet-400 shadow-lg shadow-violet-500/30"
         : "bg-slate-900/60 border-slate-700 hover:border-violet-500 hover:bg-slate-800/80 hover:shadow-md hover:shadow-violet-500/20"
     }`}
     >
-      <div className="h-12 w-12 rounded-full overflow-hidden flex items-center justify-center bg-gradient-to-br from-violet-500 to-fuchsia-500 shadow-md shadow-violet-500/30">
+      <div className="h-10 w-10 rounded-full overflow-hidden flex items-center justify-center bg-gradient-to-br from-violet-500 to-fuchsia-500 shadow-md shadow-violet-500/30">
         {otherUser?.pic ? (
           <img
             src={otherUser.pic}

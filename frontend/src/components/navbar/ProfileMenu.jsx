@@ -53,37 +53,47 @@ const ProfileMenu = () => {
         </DropdownMenuTrigger>
         <DropdownMenuContent
           align="end"
-          className="w-60 bg-black/65 backdrop-blur-xl border border-white/10 text-white"
+          className="w-65 h-50 bg-black/65 backdrop-blur-xl border border-white/20 text-white"
         >
-          <DropdownMenuLabel className="text-[14px] text-white/60 text-center">
+          <DropdownMenuLabel className="text-[16px] text-amber-300 text-center">
             {user?.username}
           </DropdownMenuLabel>
-          <DropdownMenuSeparator />
+          <DropdownMenuSeparator className={"bg-white w-auto h-0.5"} />
           <DropdownMenuItem
             onSelect={(e) => {
               e.preventDefault();
               setOpen(false);
               setProfileOpen(true);
             }}
+            className="text-[16px] text-white/75"
           >
-            <User className="mr-2 h-4 w-4" />
+            <User className="mr-2 h-6 w-6" />
             Profile
           </DropdownMenuItem>
 
-          <DropdownMenuItem onClick={() => navigate("/chats")}>
+          <DropdownMenuItem
+            onClick={() => navigate("/chats")}
+            className="text-[16px] text-white/75"
+          >
             <MessageCircle className="mr-2 h-4 w-4" />
             My Chats
           </DropdownMenuItem>
 
-          <DropdownMenuItem onClick={() => navigate("/settings")}>
+          <DropdownMenuItem
+            onClick={() => navigate("/settings")}
+            className="text-[16px] text-white/75"
+          >
             <Settings className="mr-2 h-4 w-4" />
             Settings
           </DropdownMenuItem>
 
-          <DropdownMenuSeparator />
+          <DropdownMenuSeparator className={"bg-white w-auto h-0.5 mt-1"} />
 
-          <DropdownMenuItem onClick={handleLogout} className="text-red-400">
-            <LogOut className="mr-2 h-4 w-4" />
+          <DropdownMenuItem
+            onClick={handleLogout}
+            className="text-red-400 text-[18px] text-center justify-center py-1"
+          >
+            <LogOut className="h-10 w-10" />
             Logout
           </DropdownMenuItem>
         </DropdownMenuContent>
