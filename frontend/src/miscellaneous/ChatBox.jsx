@@ -5,6 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 import ConnectedProfileModel from "./ConnectedProfileModel";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import UpdateGrpChatModal from "./UpdateGrpChatModal";
 
 const ChatBox = () => {
   const { selectedChat, setSelectedChat } = ChatState();
@@ -52,18 +53,13 @@ const ChatBox = () => {
                 {!selectedChat?.isGroupChat ? (
                   <ConnectedProfileModel user={chatDisplayUser} />
                 ) : (
-                  <></>
-                  //     {
-                  //       /* <UpdateGrpChatModal>
-
-                  // </UpdateGrpChatModal> */
-                  //     }
+                  <UpdateGrpChatModal />
                 )}
               </div>
             </div>
           </div>
-          <div>
-            
+          <div className="flex flex-1 flex-col justify-end h-full w-full rounded-lg p-3">
+            {/* messages here */}
           </div>
         </div>
       ) : (

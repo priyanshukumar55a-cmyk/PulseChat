@@ -18,7 +18,7 @@ const ConnectedProfileModel = ({ user }) => {
       <DialogTrigger asChild>
         <Button
           variant="outline"
-          className="border-white/20 text-white px-4 py-5 bg-fuchsia-400 hover:cursor-pointer hover:bg-fuchsia-500 hover:text-black/65"
+          className="border-white/20 text-white px-4 py-5 bg-fuchsia-500 hover:cursor-pointer hover:bg-fuchsia-600 hover:text-black/65"
         >
           View Profile
         </Button>
