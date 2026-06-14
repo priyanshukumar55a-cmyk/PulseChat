@@ -11,6 +11,7 @@ const cors = require("cors");
 const { notFound, errorHandler } = require('./middlewares/errorMiddleware');
 const userRouter = require('./Routes/userRoutes');
 const chatRoutes = require('./routes/chatRoutes');
+const messageRouters = require('./routes/messageRoutes');
 require('colors');
 dotenv.config();
 
@@ -24,6 +25,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/user", authRouter);
 app.use('/api/user', userRouter)
 app.use("/api/chat", chatRoutes)
+app.use("/api/message", messageRouters)
 
 app.use(notFound);
 app.use(errorHandler)
