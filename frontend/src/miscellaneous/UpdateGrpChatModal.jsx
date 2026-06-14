@@ -13,11 +13,11 @@ import { ChatState } from "@/context/chatProvider";
 import { Input } from "@/components/ui/input";
 import api from "@/api/axios";
 import { toast } from "sonner";
-import { Avatar,AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/context/AuthContext";
 
 const UpdateGrpChatModal = () => {
-  const{user} = useAuth()
+  const { user } = useAuth();
   const [open, setOpen] = useState(false);
 
   const [grpChatName, setGrpChatName] = useState("");
@@ -29,26 +29,29 @@ const UpdateGrpChatModal = () => {
 
   const { chats, setChats, selectedChat, setSelectedChat } = ChatState();
 
-    const handleRemoveUser = async (userToRemove) => {
-        
-        if (selectedChat.groupAdmin._id !== user._id && userToRemove._id !== user._id) {
-            return toast.warning("Only admins can remove someone!");
-        }
+  const handleRemoveUser = async (userToRemove) => {
+    if (
+      selectedChat.groupAdmin._id !== user._id &&
+      userToRemove._id !== user._id
+    ) {
+      return toast.warning("Only admins can remove someone!");
+    }
 
-        try {
-            setLoading(true);
-            const { data } = await api.put("chat/groupRemove", {
-                chatId: selectedChat._id,
-                userId: userToRemove._id,
-            })
+    try {
+      setLoading(true);
+      const { data } = await api.put("chat/groupRemove", {
+        chatId: selectedChat._id,
+        userId: userToRemove._id,
+      });
 
-            toast.success("User removed successfully");
-            userToRemove._id === user._id ? setSelectedChat() : setSelectedChat(data);
-        } catch (error) {
-            toast.error(error.response?.data?.message || "Error occurred!");
-        } finally {
-            setLoading(false)
-        }
+      setOpen(false)
+      toast.success("User removed successfully");
+      userToRemove._id === user._id ? setSelectedChat() : setSelectedChat(data);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Error occurred!");
+    } finally {
+      setLoading(false);
+    }
   };
   const handleRename = async () => {
     try {
@@ -58,6 +61,7 @@ const UpdateGrpChatModal = () => {
         chatName: grpChatName,
       });
 
+      setOpen(false);
       setSelectedChat(data);
       toast.success("Group name updated successfully");
     } catch (error) {
@@ -85,30 +89,31 @@ const UpdateGrpChatModal = () => {
       setLoading(false);
     }
   };
-    const handleAddUser = async (userToAdd) => {
-        if (selectedChat.users.find((u) => u._id === userToAdd._id)) {
-          return toast.warning("User already in group!")
-        }
-        
-        if (selectedChat.groupAdmin._id !== user._id) {
-            return toast.warning("Only admins can add someone!");
-        }
+  const handleAddUser = async (userToAdd) => {
+    if (selectedChat.users.find((u) => u._id === userToAdd._id)) {
+      return toast.warning("User already in group!");
+    }
 
-        try {
-            setLoading(true);
-            const { data } = await api.put("chat/groupAdd", {
-                chatId: selectedChat._id,
-                userId: user._id,
-            })
-            toast.success("User added successfully");
-            setSelectedChat(data)
-            setSearch("")
-            setSearchResult([])
-        } catch (error) {
-            toast.error(error.response?.data?.message || "Error occurred!");
-        } finally {
-            setLoading(false)
-        }
+    if (selectedChat.groupAdmin._id !== user._id) {
+      return toast.warning("Only admins can add someone!");
+    }
+
+    try {
+      setLoading(true);
+      const { data } = await api.put("chat/groupAdd", {
+        chatId: selectedChat._id,
+        userId: userToAdd._id,
+      });
+      setOpen(false);
+      toast.success("User added successfully");
+      setSelectedChat(data);
+      setSearch("");
+      setSearchResult([]);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Error occurred!");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

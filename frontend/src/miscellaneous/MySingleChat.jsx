@@ -20,9 +20,9 @@ const MySingleChat = ({ chat, user, isSelected, setSelectedChat }) => {
     <button
       onClick={() => setSelectedChat(chat)}
       className={`group w-full flex items-center gap-4 px-3 rounded-2xl text-left py-2.5
-    transition-all duration-300 border ${
+    transition-all duration-300 border cursor-pointer ${
       isSelected
-        ? "bg-gradient-to-r from-violet-600 to-fuchsia-600 border-violet-400 shadow-lg shadow-violet-500/30"
+        ? "bg-gradient-to-r from-violet-600 to-fuchsia-600/60 border-violet-400/60 shadow-lg shadow-violet-500/30"
         : "bg-slate-900/60 border-slate-700 hover:border-violet-500 hover:bg-slate-800/80 hover:shadow-md hover:shadow-violet-500/20"
     }`}
     >

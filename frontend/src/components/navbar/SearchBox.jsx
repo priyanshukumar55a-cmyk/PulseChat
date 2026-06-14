@@ -9,16 +9,12 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-import {
-  Command,
-  CommandEmpty,
-  CommandList,
-} from "@/components/ui/command";
-import {useChatAccess} from "./useChatAccess";
+import { Command, CommandEmpty, CommandList } from "@/components/ui/command";
+import { useChatAccess } from "./useChatAccess";
 import { useNavigate } from "react-router-dom";
 
 const SearchBox = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const { accessChat, loadingChat } = useChatAccess();
 
   const [search, setSearch] = useState("");
@@ -59,15 +55,15 @@ const SearchBox = () => {
 
   const handleSelectUser = async (user) => {
     setSearch("");
-    setResults([]); 
-    await accessChat(user._id || user.id) ;
-    navigate("/chats")
+    setResults([]);
+    await accessChat(user._id || user.id);
+    navigate("/chats");
   };
-  const open = search.trim().length > 0;
+  const open = search.trim().length > 0 && (loadingSearch || results.length > 0);
 
   return (
     <Popover open={open}>
-      <div className="hidden sm:flex items-center mx-6 w-96">
+      <div className="w-full">
         <PopoverTrigger asChild>
           <div className="flex items-center w-full gap-2">
             <div className="relative flex-1">
@@ -78,11 +74,9 @@ const SearchBox = () => {
                 onFocus={() => setFocused(true)}
                 onBlur={() => setFocused(false)}
                 placeholder="Search by name or email"
-                autoComplete="off"
-                autoCorrect="off"
-                autoCapitalize="off"
+                autoComplete="new-password"
                 spellCheck={false}
-                className="w-full pr-9 px-3 py-2 rounded-xl bg-white/5 text-white placeholder:text-white/50 border border-white/10 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all duration-300"
+                className="w-full pr-9 px-3 h-10 rounded-xl bg-white/5 text-white placeholder:text-white/60 border border-white/20 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all duration-300"
               />
 
               {/* Clear button: visible when input has text or when focused */}
@@ -100,7 +94,7 @@ const SearchBox = () => {
               </button>
             </div>
 
-            <div className="p-2 rounded-lg bg-indigo-600 text-white hidden sm:inline-flex">
+            <div className="p-2.5 rounded-lg bg-indigo-600 text-white inline-flex shrink-0 border-white/25 border-[0.2px]">
               {loadingChat || loadingSearch ? (
                 <Loader2 className="animate-spin" size={16} />
               ) : (
@@ -111,8 +105,10 @@ const SearchBox = () => {
         </PopoverTrigger>
 
         <PopoverContent
+          onOpenAutoFocus={(e) => e.preventDefault()}
           align="start"
-          className="w-96 p-2 bg-black/80 backdrop-blur-xl border border-white/10"
+          sideOffset={8}
+          className="w-[var(--radix-popover-trigger-width)] p-2 bg-black/80 backdrop-blur-xl border border-white/10"
         >
           <Command className="bg-transparent">
             <CommandList>
@@ -124,7 +120,7 @@ const SearchBox = () => {
                     key={u._id || u.id}
                     value={`${u.username} ${u.email}`}
                     onClick={() => handleSelectUser(u)}
-                    className="cursor-pointer p-0 m-2 rounded-xl bg-white/5 hover:bg-amber-300"
+                    className=" cursor-pointer rounded-xl bg-white/5 hover:bg-white/10 transition-colors my-2"
                   >
                     <UserListItem user={u} />
                   </div>

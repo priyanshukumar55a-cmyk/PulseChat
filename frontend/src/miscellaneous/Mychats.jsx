@@ -8,8 +8,10 @@ import MySingleChat from "./MySingleChat";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import GrpChatModal from "./GrpChatModal";
+import SearchBox from "@/components/navbar/SearchBox";
 
 const Mychats = () => {
+  const { isAuthenticated } = useAuth();
   const [loading, setLoading] = useState(false);
   const { chats, setChats, selectedChat, setSelectedChat } = ChatState();
   const [open, setOpen] = useState(false);
@@ -39,7 +41,7 @@ const Mychats = () => {
 
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button className="py-5 px-3 bg-fuchsia-500 hover:bg-fuchsia-500/70 cursor-pointer">
+            <Button className="md:py-5 md:px-3 py-4 bg-fuchsia-500 hover:bg-fuchsia-500/70 cursor-pointer">
               <Plus className="h-5 w-5" />
               Create New Group
             </Button>
@@ -51,6 +53,10 @@ const Mychats = () => {
         </Dialog>
       </div>
       {/* Loading */}
+      {/* Search (authenticated only) */}
+        <div className="sm:hidden mt-0.5 mb-3 ml-1">
+          {isAuthenticated && <SearchBox />}
+        </div>
       <div className="overflow-y-auto scrollbar-none flex-1">
         {loading ? (
           <div className="flex flex-col gap-3">

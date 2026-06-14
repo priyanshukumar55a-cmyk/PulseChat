@@ -16,7 +16,7 @@ const GrpChatModal = ({setOpen}) => {
   const [searchResult, setSearchResult] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const { chats, setChats } = ChatState();
+  const { chats, setChats, setSelectedChat } = ChatState();
   const handleSearch = async (query) => {
     setSearch(query);
     if (!query) {
@@ -69,6 +69,7 @@ const GrpChatModal = ({setOpen}) => {
 
       setChats([data, ...chats])
       setOpen(false)
+      setSelectedChat(data)
       toast.success("Group created successfully");
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to create group");
