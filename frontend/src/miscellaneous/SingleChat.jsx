@@ -12,19 +12,44 @@ import React, {
 } from "react";
 import { toast } from "sonner";
 import ScrollableChat from "./ScrollableChat";
+import { io } from "socket.io-client";
+import { useAuth } from "@/context/AuthContext";
+
+const ENDPOINT = "http://localhost:3001";
+var socket, selectedChatCompare;
 
 const SingleChat = forwardRef((props, ref) => {
+  const { user } = useAuth();
   const chatContainerRef = useRef(null);
   const { selectedChat } = ChatState();
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [newMessage, setNewMessage] = useState("");
+  const [socketConnected, setSocketConnected] = useState(false);
 
   useEffect(() => {
-    chatContainerRef.current?.scrollTo({
-      top: chatContainerRef.current.scrollHeight,
-      behavior: "smooth",
-    });
+    socket = io(ENDPOINT);
+    socket.emit("setup", user);
+    socket.on("connected", () => setSocketConnected(true));
+
+    return () => {
+      socket.disconnect();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!selectedChat) return;
+
+    if (socketConnected) {
+      socket.emit("join chat", selectedChat._id);
+    }
+  }, [selectedChat]);
+
+  useEffect(() => {
+    const container = chatContainerRef.current;
+    if (!container) return;
+
+    container.scrollTop = container.scrollHeight;
   }, [messages]);
 
   const fetchMessages = async () => {
@@ -45,7 +70,19 @@ const SingleChat = forwardRef((props, ref) => {
   useEffect(() => {
     setMessages([]);
     fetchMessages();
+    selectedChatCompare = selectedChat;
   }, [selectedChat]);
+
+  useEffect(() => {
+    socket.on("message received", (newMessageReceived) => {
+      if (!selectedChatCompare || selectedChatCompare._id !== newMessageReceived.chat._id) {
+        // give notification
+      }
+      else {
+        setMessages((prev) => [...prev, newMessageReceived])
+      }
+    });
+  },[]);
 
   useImperativeHandle(ref, () => ({
     fetchMessages,
@@ -63,11 +100,13 @@ const SingleChat = forwardRef((props, ref) => {
         chatId: selectedChat._id,
       });
 
+      socket.emit('new message', data)
       setMessages((prev) => [...prev, data]);
     } catch (error) {
       toast.error("Error Occured!");
     }
   };
+
   const typingHandler = (e) => {
     setNewMessage(e.target.value);
 
@@ -75,13 +114,16 @@ const SingleChat = forwardRef((props, ref) => {
   };
   return (
     <div className="flex h-full min-h-0 flex-col scrollbar-thumb-gray-300">
-      <div className="flex-1 min-h-0 overflow-y-auto scrollbar scrollbar-w-2 scrollbar-thumb-rounded-full scrollbar-thumb-white/20 scrollbar-track-transparent hover:scrollbar-thumb-white/35">
+      <div
+        ref={chatContainerRef}
+        className="flex-1 min-h-0 overflow-y-auto scrollbar scrollbar-w-2 scrollbar-thumb-rounded-full scrollbar-thumb-white/20 scrollbar-track-transparent hover:scrollbar-thumb-white/35"
+      >
         {loading ? (
           <div className="flex h-full items-center justify-center">
             <Loader2 className="h-12 w-12 md:h-16 md:w-16 animate-spin text-white" />
           </div>
         ) : (
-          <div ref={chatContainerRef} className="flex-1 min-h-0 p-3">
+          <div className="flex-1 min-h-0 p-3">
             <ScrollableChat messages={messages} />
           </div>
         )}
