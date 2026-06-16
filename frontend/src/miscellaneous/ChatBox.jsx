@@ -20,7 +20,7 @@ const ChatBox = () => {
   return (
     <div className="h-full flex flex-col backdrop-blur-sm bg-white/5 border border-white/10 rounded-3xl">
       {selectedChat ? (
-        <div className="flex flex-1 flex-col">
+        <div className="flex-1 min-h-0 flex flex-col">
           <div className="border-b border-white/15 px-4 py-3">
             <div className="flex items-center gap-3">
               <button
@@ -63,7 +63,9 @@ const ChatBox = () => {
             </div>
           </div>
           {/* messages here */}
-          <SingleChat ref={chatRef} />
+          <div className="flex-1 min-h-0">
+            <SingleChat ref={chatRef} />
+          </div>
         </div>
       ) : (
         <div className="flex-1 flex flex-col items-center justify-center text-center px-6">

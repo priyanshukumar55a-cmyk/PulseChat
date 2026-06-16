@@ -21,10 +21,10 @@ const SingleChat = forwardRef((props, ref) => {
   const [newMessage, setNewMessage] = useState("");
 
   useEffect(() => {
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop =
-        chatContainerRef.current.scrollHeight;
-    }
+    chatContainerRef.current?.scrollTo({
+      top: chatContainerRef.current.scrollHeight,
+      behavior: "smooth",
+    });
   }, [messages]);
 
   const fetchMessages = async () => {
@@ -74,49 +74,48 @@ const SingleChat = forwardRef((props, ref) => {
     // typing indicator logic
   };
   return (
-    <>
-      <div className="flex flex-1 flex-col min-h-0 w-full">
+    <div className="flex h-full min-h-0 flex-col scrollbar-thumb-gray-300">
+      <div className="flex-1 min-h-0 overflow-y-auto scrollbar scrollbar-w-2 scrollbar-thumb-rounded-full scrollbar-thumb-white/20 scrollbar-track-transparent hover:scrollbar-thumb-white/35">
         {loading ? (
           <div className="flex h-full items-center justify-center">
             <Loader2 className="h-12 w-12 md:h-16 md:w-16 animate-spin text-white" />
           </div>
         ) : (
-          <div
-            ref={chatContainerRef}
-            className="flex-1 overflow-y-auto min-h-0 p-3"
-          >
-            <div className="min-h-full flex flex-col justify-end">
-              <ScrollableChat messages={messages} />
-            </div>
-          </div> 
+          <div ref={chatContainerRef} className="flex-1 min-h-0 p-3">
+            <ScrollableChat messages={messages} />
+          </div>
         )}
       </div>
-      <div className="flex items-end gap-2 p-3 border-t bg-background rounded-b-xl">
-        <Textarea
-          value={newMessage}
-          onChange={typingHandler}
-          disabled={loading}
-          placeholder="Type a message..."
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && !e.shiftKey) {
-              e.preventDefault(); // Prevent newline
-              sendMessage();
-            }
-          }}
-          rows={1}
-          className="min-h-[40px] max-h-32 resize-none flex-1 min-w-0 break-all"
-        />
 
-        <Button
-          disabled={loading || !newMessage.trim()}
-          onClick={sendMessage}
-          size="icon"
-          className="cursor-pointer mb-1"
-        >
-          <Send className="h-4 w-4 " />
-        </Button>
+      <div className="flex-shrink-0 rounded-b-2xl bg-slate-950/40 border-t border-white/10 backdrop-blur-xl p-2">
+        <div className="flex items-center gap-3 rounded-3xl border border-white/10 bg-white/10 py-1 shadow-lg shadow-black/10 pl-2">
+          <Textarea
+            value={newMessage}
+            onChange={typingHandler}
+            disabled={loading}
+            placeholder="Type a message..."
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault(); // Prevent newline
+                sendMessage();
+              }
+            }}
+            rows={1}
+            className="min-h-[40px] resize-none flex-1 min-w-0 rounded-2xl border-none bg-transparent px-3 text-white placeholder:text-white/60 focus:ring-0"
+          />
+
+          <Button
+            disabled={loading || !newMessage.trim()}
+            onClick={sendMessage}
+            size="icon"
+            className="h-12 w-12 rounded-2xl bg-violet-600 text-white hover:bg-violet-500"
+            aria-label="Send message"
+          >
+            <Send className="h-5 w-5" />
+          </Button>
+        </div>
       </div>
-    </>
+    </div>
   );
 });
 
