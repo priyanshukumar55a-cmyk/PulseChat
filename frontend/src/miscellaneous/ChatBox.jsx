@@ -6,8 +6,10 @@ import ConnectedProfileModel from "./ConnectedProfileModel";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import UpdateGrpChatModal from "./UpdateGrpChatModal";
+import SingleChat from "./SingleChat";
 
 const ChatBox = () => {
+  const chatRef = useRef();
   const { selectedChat, setSelectedChat } = ChatState();
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
@@ -53,14 +55,15 @@ const ChatBox = () => {
                 {!selectedChat?.isGroupChat ? (
                   <ConnectedProfileModel user={chatDisplayUser} />
                 ) : (
-                  <UpdateGrpChatModal />
+                  <UpdateGrpChatModal
+                    fetchMessages={() => chatRef.current?.fetchMessages()}
+                  />
                 )}
               </div>
             </div>
           </div>
-          <div className="flex flex-1 flex-col justify-end h-full w-full rounded-lg p-3">
-            {/* messages here */}
-          </div>
+          {/* messages here */}
+          <SingleChat ref={chatRef} />
         </div>
       ) : (
         <div className="flex-1 flex flex-col items-center justify-center text-center px-6">

@@ -16,7 +16,7 @@ import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/context/AuthContext";
 
-const UpdateGrpChatModal = () => {
+const UpdateGrpChatModal = ({ fetchMessages }) => {
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
 
@@ -44,9 +44,10 @@ const UpdateGrpChatModal = () => {
         userId: userToRemove._id,
       });
 
-      setOpen(false)
+      setOpen(false);
       toast.success("User removed successfully");
       userToRemove._id === user._id ? setSelectedChat() : setSelectedChat(data);
+      fetchMessages();
     } catch (error) {
       toast.error(error.response?.data?.message || "Error occurred!");
     } finally {

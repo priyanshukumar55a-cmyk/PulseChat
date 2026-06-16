@@ -18,7 +18,7 @@ const protect = async (req, res, next) => {
       }
 
       // Helpful logging for debugging auth issues
-      console.log("auth: decoded id ->", decoded.id);
+      // console.log("auth: decoded id ->", decoded.id);
 
       req.user = await User.findById(decoded.id).select("-password");
 
