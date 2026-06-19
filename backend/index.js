@@ -85,10 +85,15 @@ io.on("connection", (socket) => {
     var chat = newMessageReceived.chat;
     if (!chat.users) return console.log("chat.users is not defined")
     
+      console.log("NEW MESSAGE");
+      console.log(newMessageReceived.content);
+      console.log(newMessageReceived.chat._id);
+    
     chat.users.forEach(user => {
       if (user._id === newMessageReceived.sender._id) return;
 
       socket.in(user._id).emit('message received', newMessageReceived)
+      console.log(`Sent message to ${user._id}`);
     });
   })
 

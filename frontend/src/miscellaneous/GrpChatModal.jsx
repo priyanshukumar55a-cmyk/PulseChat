@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 
-const GrpChatModal = ({setOpen}) => {
+const GrpChatModal = ({ setOpen }) => {
   const [grpChatName, setGrpChatName] = useState("");
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [search, setSearch] = useState("");
@@ -67,9 +67,9 @@ const GrpChatModal = ({setOpen}) => {
       setSearch("");
       setSearchResult([]);
 
-      setChats([data, ...chats])
-      setOpen(false)
-      setSelectedChat(data)
+      setChats([data, ...chats]);
+      setOpen(false);
+      setSelectedChat(data);
       toast.success("Group created successfully");
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to create group");
@@ -125,24 +125,40 @@ const GrpChatModal = ({setOpen}) => {
         ) : (
           searchResult?.slice(0, 4).map((user) => {
             return (
-              <button
+              <div
                 key={user._id}
-                type="button"
                 onClick={() => handleGroup(user)}
-                className="w-full flex items-center gap-3 px-4 py-2 text-left transition border-2 rounded-md border-black/15 hover:cursor-pointer bg-cyan-300 hover:bg-cyan-200"
+                className="w-full flex items-center justify-between gap-3 px-4 py-2 transition border-2 rounded-md border-black/15 bg-cyan-300 cursor-pointer"
               >
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src={user?.pic} alt={user?.username} />
-                  <AvatarFallback>
-                    {user?.username?.[0]?.toUpperCase() || "U"}
-                  </AvatarFallback>
-                </Avatar>
+                <div className="flex items-center gap-3 text-left w-full">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={user?.pic} alt={user?.username} />
+                    <AvatarFallback>
+                      {user?.username?.[0]?.toUpperCase() || "U"}
+                    </AvatarFallback>
+                  </Avatar>
 
-                <div>
-                  <p className="font-medium">{user.username}</p>
-                  <p className="text-xs text-muted-foreground">{user.email}</p>
+                  <div className="flex-1">
+                    <p className="font-medium">{user.username}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {user.email}
+                    </p>
+                  </div>
                 </div>
-              </button>
+
+                <div className="flex-shrink-0 ml-3">
+                  <Button
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleGroup(user);
+                    }}
+                    className="bg-violet-600 hover:bg-violet-500 text-white cursor-pointer"
+                  >
+                    Add
+                  </Button>
+                </div>
+              </div>
             );
           })
         )}

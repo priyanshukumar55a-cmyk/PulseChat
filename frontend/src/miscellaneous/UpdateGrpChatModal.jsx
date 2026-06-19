@@ -21,13 +21,12 @@ const UpdateGrpChatModal = ({ fetchMessages }) => {
   const [open, setOpen] = useState(false);
 
   const [grpChatName, setGrpChatName] = useState("");
-  const [selectedUsers, setSelectedUsers] = useState([]);
   const [search, setSearch] = useState("");
   const [searchResult, setSearchResult] = useState([]);
   const [loading, setLoading] = useState(false);
   const [renameLoading, setRenameLoading] = useState(false);
 
-  const { chats, setChats, selectedChat, setSelectedChat } = ChatState();
+  const { selectedChat, setSelectedChat } = ChatState();
 
   const handleRemoveUser = async (userToRemove) => {
     if (
@@ -162,7 +161,7 @@ const UpdateGrpChatModal = ({ fetchMessages }) => {
         </div>
         <Input
           className="border-purple-400 px-4 py-5"
-          placeholder="Search users by name or email"
+          placeholder="Search users to add them to the group"
           value={search}
           onChange={(e) => handleSearch(e.target.value)}
           autoComplete="new-password"

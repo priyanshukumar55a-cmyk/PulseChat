@@ -2,27 +2,32 @@ import { useSocket } from "@/context/SocketProvider";
 import React, { useEffect, useState } from "react";
 
 const MySingleChat = ({ chat, user, isSelected, setSelectedChat }) => {
-  const { activeUsers } = useSocket()
+  const { activeUsers } = useSocket();
   const [latestMsg, setLatestMsg] = useState(chat.latestMessage);
-  
+
   useEffect(() => setLatestMsg(chat.latestMessage), [chat.latestMessage]);
-  
+
   const otherUser =
-  !chat.isGroupChat && chat.users?.find((u) => u._id !== user?._id);
-  const isOnline = activeUsers.includes(otherUser._id);
+    !chat.isGroupChat && chat.users?.find((u) => u._id !== user?._id);
+  const isOnline = activeUsers.includes(otherUser?._id);
 
   const grpName = chat.isGroupChat
     ? chat.chatName
     : otherUser?.username || chat.chatName || "Unknown";
 
-  const preview = latestMsg
-    ? `${latestMsg.sender?.username ? (latestMsg.sender._id != user._id ? "user" : "you") + ": " : ""}${latestMsg.content.slice(0, 40)}${
-        latestMsg.content.length > 40 ? "..." : ""
-      }`
-    : "No messages yet";
+    const senderPrefix = latestMsg?.sender?.username
+      ? chat?.latestMessage?.sender._id === user._id
+        ? "You: "
+        : chat?.isGroupChat
+          ? `${chat?.latestMessage?.sender.username}: `
+          : ""
+      : "";
 
-  const showUnread =
-    latestMsg && latestMsg.sender && latestMsg.sender._id !== user?._id;
+    const preview = chat?.latestMessage
+      ? `${senderPrefix}${chat?.latestMessage?.content.slice(0, 40)}${
+          chat?.latestMessage?.content.length > 40 ? "..." : ""
+        }`
+      : "No messages yet";
 
   return (
     <button
@@ -71,10 +76,6 @@ const MySingleChat = ({ chat, user, isSelected, setSelectedChat }) => {
           >
             {preview}
           </p>
-
-          {showUnread && (
-            <span className="ml-auto h-3 w-3 rounded-full bg-emerald-400 shadow-lg shadow-emerald-400/60 animate-pulse" />
-          )}
         </div>
       </div>
     </button>

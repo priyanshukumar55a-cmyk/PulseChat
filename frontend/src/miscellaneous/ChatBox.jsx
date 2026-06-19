@@ -45,16 +45,24 @@ const ChatBox = () => {
                     : otherUser?.username}
                 </h2>
 
-                <div className="flex items-center gap-2">
-                  <span
-                    className={`h-2 w-2 rounded-full ${
-                      active ? "bg-green-500" : "bg-gray-500"
-                    }`}
-                  />
-                  <p className="text-xs text-white/60">
-                    {active ? "Active Now" : "Offline"}
-                  </p>
-                </div>
+                {!selectedChat.isGroupChat ? (
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`h-2 w-2 rounded-full ${
+                        active ? "bg-green-500" : "bg-gray-500"
+                      }`}
+                    />
+                    <p className="text-xs text-white/60">
+                      {active ? "Active Now" : "Offline"}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <p className="text-xs text-white/60">
+                      {selectedChat.users.length} members
+                    </p>
+                  </div>
+                )}
               </div>
               <div className="ml-auto">
                 {!selectedChat?.isGroupChat ? (

@@ -14,8 +14,6 @@ import { toast } from "sonner";
 import ScrollableChat from "./ScrollableChat";
 import { useSocket } from "@/context/SocketProvider";
 
-let selectedChatCompare;
-
 const SingleChat = forwardRef((props, ref) => {
   const { socket, connected } = useSocket();
   const { selectedChat } = ChatState();
@@ -40,10 +38,7 @@ const SingleChat = forwardRef((props, ref) => {
     const handleTyping = () => setIsTyping(true);
     const handleStopTyping = () => setIsTyping(false);
     const handleMessageReceived = (newMessageReceived) => {
-      if (
-        !selectedChatCompare ||
-        selectedChatCompare._id !== newMessageReceived.chat._id
-      ) {
+      if (!selectedChat || selectedChat._id !== newMessageReceived.chat._id) {
         return;
       }
 
@@ -65,7 +60,7 @@ const SingleChat = forwardRef((props, ref) => {
       socket.off("stop typing", handleStopTyping);
       socket.off("message received", handleMessageReceived);
     };
-  }, [socket]);
+  }, [socket, selectedChat]);
 
   // =========================
   // JOIN CHAT ROOM
@@ -75,8 +70,6 @@ const SingleChat = forwardRef((props, ref) => {
     if (!selectedChat || !socketConnected) return;
 
     socket.emit("join chat", selectedChat._id);
-
-    selectedChatCompare = selectedChat;
   }, [selectedChat, socketConnected]);
 
   // =========================
@@ -102,8 +95,6 @@ const SingleChat = forwardRef((props, ref) => {
   useEffect(() => {
     setMessages([]);
     fetchMessages();
-
-    selectedChatCompare = selectedChat;
   }, [selectedChat]);
 
   useImperativeHandle(ref, () => ({

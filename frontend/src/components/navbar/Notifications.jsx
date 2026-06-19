@@ -1,5 +1,4 @@
 import { Bell, BellDot } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
 import {
   DropdownMenu,
@@ -9,26 +8,18 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ChatState } from "@/context/chatProvider";
+import { useEffect } from "react";
 
 export default function Notifications() {
-  const navigate = useNavigate();
-
-  // Dummy notifications for now
-  const notifications = [
-    {
-      id: 1,
-      message: "Rahul sent you a message",
-      chatId: "123",
-    },
-    {
-      id: 2,
-      message: "Priya mentioned you",
-      chatId: "456",
-    },
-  ];
+  const { notifications, selectedChat, setSelectedChat, setNotifications } = ChatState();
+  console.log("notifications:", notifications);
 
   const handleNotificationClick = (notification) => {
-    navigate(`/chats/${notification.chatId}`);
+    setSelectedChat(notification.chat);
+    setNotifications((prev) =>
+      prev.filter((noti) => noti._id !== notification._id),
+    );
   };
 
   return (
@@ -42,7 +33,7 @@ export default function Notifications() {
           )}
 
           {notifications.length > 0 && (
-            <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] text-white">
+            <span className="absolute top-0 right-0.75 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] text-white">
               {notifications.length}
             </span>
           )}
@@ -64,11 +55,14 @@ export default function Notifications() {
         ) : (
           notifications.map((notification) => (
             <DropdownMenuItem
-              key={notification.id}
+              key={notification._id}
               onClick={() => handleNotificationClick(notification)}
               className="cursor-pointer p-2"
             >
-              {notification.message}
+              {notification.chat.isGroupChat
+                ? notification.chat.chatName
+                : notification.sender.username}
+              : {notification.content}
             </DropdownMenuItem>
           ))
         )}
