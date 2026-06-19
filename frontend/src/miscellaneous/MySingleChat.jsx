@@ -1,16 +1,15 @@
+import { useSocket } from "@/context/SocketProvider";
 import React, { useEffect, useState } from "react";
-import { io } from "socket.io-client";
-
-const ENDPOINT = "http://localhost:3001";
 
 const MySingleChat = ({ chat, user, isSelected, setSelectedChat }) => {
+  const { activeUsers } = useSocket()
   const [latestMsg, setLatestMsg] = useState(chat.latestMessage);
-  const [isOnline, setIsOnline] = useState(false);
-
+  
   useEffect(() => setLatestMsg(chat.latestMessage), [chat.latestMessage]);
-
+  
   const otherUser =
-    !chat.isGroupChat && chat.users?.find((u) => u._id !== user?._id);
+  !chat.isGroupChat && chat.users?.find((u) => u._id !== user?._id);
+  const isOnline = activeUsers.includes(otherUser._id);
 
   const grpName = chat.isGroupChat
     ? chat.chatName
@@ -24,29 +23,6 @@ const MySingleChat = ({ chat, user, isSelected, setSelectedChat }) => {
 
   const showUnread =
     latestMsg && latestMsg.sender && latestMsg.sender._id !== user?._id;
-
-  // listen for active users from socket server to determine online status
-  useEffect(() => {
-    if (!otherUser) return;
-
-    const socket = io(ENDPOINT, { transports: ["websocket"] });
-
-    socket.emit("setup", user);
-
-    const handleActive = (activeList) => {
-      if (!Array.isArray(activeList)) return;
-      setIsOnline(activeList.includes(otherUser._id));
-    };
-
-    socket.on("active users", handleActive);
-
-    // optionally request current active users (server broadcasts on setup)
-
-    return () => {
-      socket.off("active users", handleActive);
-      socket.disconnect();
-    };
-  }, [otherUser, user]);
 
   return (
     <button

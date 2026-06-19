@@ -12,26 +12,22 @@ import React, {
 } from "react";
 import { toast } from "sonner";
 import ScrollableChat from "./ScrollableChat";
-import { io } from "socket.io-client";
-import { useAuth } from "@/context/AuthContext";
-
-const ENDPOINT = "http://localhost:3001";
+import { useSocket } from "@/context/SocketProvider";
 
 let selectedChatCompare;
 
 const SingleChat = forwardRef((props, ref) => {
-  const { user } = useAuth();
+  const { socket, connected } = useSocket();
   const { selectedChat } = ChatState();
 
   const chatContainerRef = useRef(null);
-  const socketRef = useRef(null);
   const typingTimeoutRef = useRef(null);
   const typingRef = useRef(false);
 
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [newMessage, setNewMessage] = useState("");
-  const [socketConnected, setSocketConnected] = useState(false);
+  const socketConnected = connected;
   const [isTyping, setIsTyping] = useState(false);
 
   // =========================
@@ -39,30 +35,15 @@ const SingleChat = forwardRef((props, ref) => {
   // =========================
 
   useEffect(() => {
-    const socket = io(ENDPOINT);
+    if (!socket) return;
 
-    socketRef.current = socket;
-
-    socket.emit("setup", user);
-
-    socket.on("connected", () => {
-      setSocketConnected(true);
-    });
-
-    socket.on("typing", () => {
-      setIsTyping(true);
-    });
-
-    socket.on("stop typing", () => {
-      setIsTyping(false);
-    });
-
-    socket.on("message received", (newMessageReceived) => {
+    const handleTyping = () => setIsTyping(true);
+    const handleStopTyping = () => setIsTyping(false);
+    const handleMessageReceived = (newMessageReceived) => {
       if (
         !selectedChatCompare ||
         selectedChatCompare._id !== newMessageReceived.chat._id
       ) {
-        // notification logic
         return;
       }
 
@@ -73,12 +54,18 @@ const SingleChat = forwardRef((props, ref) => {
 
         return [...prev, newMessageReceived];
       });
-    });
+    };
+
+    socket.on("typing", handleTyping);
+    socket.on("stop typing", handleStopTyping);
+    socket.on("message received", handleMessageReceived);
 
     return () => {
-      socket.disconnect();
+      socket.off("typing", handleTyping);
+      socket.off("stop typing", handleStopTyping);
+      socket.off("message received", handleMessageReceived);
     };
-  }, [user]);
+  }, [socket]);
 
   // =========================
   // JOIN CHAT ROOM
@@ -87,7 +74,7 @@ const SingleChat = forwardRef((props, ref) => {
   useEffect(() => {
     if (!selectedChat || !socketConnected) return;
 
-    socketRef.current.emit("join chat", selectedChat._id);
+    socket.emit("join chat", selectedChat._id);
 
     selectedChatCompare = selectedChat;
   }, [selectedChat, socketConnected]);
@@ -145,7 +132,7 @@ const SingleChat = forwardRef((props, ref) => {
 
     try {
       if (typingRef.current) {
-        socketRef.current.emit("stop typing", selectedChat._id);
+        socket.emit("stop typing", selectedChat._id);
 
         typingRef.current = false;
 
@@ -163,7 +150,7 @@ const SingleChat = forwardRef((props, ref) => {
 
       setMessages((prev) => [...prev, data]);
 
-      socketRef.current.emit("new message", data);
+      socket.emit("new message", data);
     } catch (error) {
       toast.error("Error occurred");
     }
@@ -181,13 +168,13 @@ const SingleChat = forwardRef((props, ref) => {
     if (!typingRef.current) {
       typingRef.current = true;
 
-      socketRef.current.emit("typing", selectedChat._id);
+      socket.emit("typing", selectedChat._id);
     }
 
     clearTimeout(typingTimeoutRef.current);
 
     typingTimeoutRef.current = setTimeout(() => {
-      socketRef.current.emit("stop typing", selectedChat._id);
+      socket.emit("stop typing", selectedChat._id);
 
       typingRef.current = false;
     }, 2000);

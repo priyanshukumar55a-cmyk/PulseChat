@@ -6,38 +6,16 @@ import ConnectedProfileModel from "./ConnectedProfileModel";
 import UpdateGrpChatModal from "./UpdateGrpChatModal";
 import SingleChat from "./SingleChat";
 
-import { io } from "socket.io-client";
-const ENDPOINT = "http://localhost:3001";
+import { useSocket } from "@/context/SocketProvider";
 
 const ChatBox = () => {
+   const { activeUsers } = useSocket()
   const chatRef = useRef();
   const {  selectedChat, setSelectedChat } = ChatState();
   const { user } = useAuth();
-  const [active, setActive] = useState(false);
-
   const otherUser =
     !selectedChat?.isGroupChat && selectedChat?.users?.find((u) => u._id !== user?._id);
-
-  useEffect(() => {
-    if (!otherUser) return;
-
-    const socket = io(ENDPOINT, { transports: ["websocket"] });
-    socket.emit("setup", user);
-
-    const handleActive = (activeList) => {
-      if (!Array.isArray(activeList)) return;
-      setActive(activeList.includes(otherUser._id));
-    };
-
-    socket.on("active users", handleActive);
-
-    // optionally request current active users (server broadcasts on setup)
-
-    return () => {
-      socket.off("active users", handleActive);
-      socket.disconnect();
-    };
-  }, [otherUser, user]);
+  const active = activeUsers.includes(otherUser?._id)
 
   return (
     <div className="h-full flex flex-col backdrop-blur-sm bg-white/5 border border-white/10 rounded-3xl">
