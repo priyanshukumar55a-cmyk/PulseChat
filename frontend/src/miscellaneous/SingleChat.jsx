@@ -16,52 +16,97 @@ import { io } from "socket.io-client";
 import { useAuth } from "@/context/AuthContext";
 
 const ENDPOINT = "http://localhost:3001";
-var socket, selectedChatCompare;
+
+let selectedChatCompare;
 
 const SingleChat = forwardRef((props, ref) => {
   const { user } = useAuth();
-  const chatContainerRef = useRef(null);
   const { selectedChat } = ChatState();
+
+  const chatContainerRef = useRef(null);
+  const socketRef = useRef(null);
+  const typingTimeoutRef = useRef(null);
+  const typingRef = useRef(false);
+
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [newMessage, setNewMessage] = useState("");
   const [socketConnected, setSocketConnected] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
+
+  // =========================
+  // SOCKET SETUP
+  // =========================
 
   useEffect(() => {
-    socket = io(ENDPOINT);
+    const socket = io(ENDPOINT);
+
+    socketRef.current = socket;
+
     socket.emit("setup", user);
-    socket.on("connected", () => setSocketConnected(true));
+
+    socket.on("connected", () => {
+      setSocketConnected(true);
+    });
+
+    socket.on("typing", () => {
+      setIsTyping(true);
+    });
+
+    socket.on("stop typing", () => {
+      setIsTyping(false);
+    });
+
+    socket.on("message received", (newMessageReceived) => {
+      if (
+        !selectedChatCompare ||
+        selectedChatCompare._id !== newMessageReceived.chat._id
+      ) {
+        // notification logic
+        return;
+      }
+
+      setMessages((prev) => {
+        if (prev.some((m) => m._id === newMessageReceived._id)) {
+          return prev;
+        }
+
+        return [...prev, newMessageReceived];
+      });
+    });
 
     return () => {
       socket.disconnect();
-    }
-  }, []);
+    };
+  }, [user]);
+
+  // =========================
+  // JOIN CHAT ROOM
+  // =========================
 
   useEffect(() => {
-    if (!selectedChat) return;
+    if (!selectedChat || !socketConnected) return;
 
-    if (socketConnected) {
-      socket.emit("join chat", selectedChat._id);
-    }
-  }, [selectedChat]);
+    socketRef.current.emit("join chat", selectedChat._id);
 
-  useEffect(() => {
-    const container = chatContainerRef.current;
-    if (!container) return;
+    selectedChatCompare = selectedChat;
+  }, [selectedChat, socketConnected]);
 
-    container.scrollTop = container.scrollHeight;
-  }, [messages]);
+  // =========================
+  // FETCH MESSAGES
+  // =========================
 
   const fetchMessages = async () => {
     if (!selectedChat) return;
 
     try {
       setLoading(true);
+
       const { data } = await api.get(`/message/${selectedChat._id}`);
-      console.log(data);
+
       setMessages(data);
     } catch (error) {
-      toast.error("Failed to Load the Messages");
+      toast.error("Failed to load messages");
     } finally {
       setLoading(false);
     }
@@ -70,88 +115,137 @@ const SingleChat = forwardRef((props, ref) => {
   useEffect(() => {
     setMessages([]);
     fetchMessages();
+
     selectedChatCompare = selectedChat;
   }, [selectedChat]);
-
-  useEffect(() => {
-    socket.on("message received", (newMessageReceived) => {
-      if (!selectedChatCompare || selectedChatCompare._id !== newMessageReceived.chat._id) {
-        // give notification
-      }
-      else {
-        setMessages((prev) => [...prev, newMessageReceived])
-      }
-    });
-  },[]);
 
   useImperativeHandle(ref, () => ({
     fetchMessages,
   }));
 
+  // =========================
+  // AUTO SCROLL
+  // =========================
+
+  useEffect(() => {
+    const container = chatContainerRef.current;
+
+    if (!container) return;
+
+    container.scrollTop = container.scrollHeight;
+  }, [messages, isTyping]);
+
+  // =========================
+  // SEND MESSAGE
+  // =========================
+
   const sendMessage = async () => {
-    if (!selectedChat?._id) return;
     if (!newMessage.trim()) return;
+    if (!selectedChat) return;
+
     try {
-      const messageToSend = newMessage;
+      if (typingRef.current) {
+        socketRef.current.emit("stop typing", selectedChat._id);
+
+        typingRef.current = false;
+
+        clearTimeout(typingTimeoutRef.current);
+      }
+
+      const content = newMessage;
+
       setNewMessage("");
 
       const { data } = await api.post("/message", {
-        content: messageToSend,
+        content,
         chatId: selectedChat._id,
       });
 
-      socket.emit('new message', data)
       setMessages((prev) => [...prev, data]);
+
+      socketRef.current.emit("new message", data);
     } catch (error) {
-      toast.error("Error Occured!");
+      toast.error("Error occurred");
     }
   };
+
+  // =========================
+  // TYPING HANDLER
+  // =========================
 
   const typingHandler = (e) => {
     setNewMessage(e.target.value);
 
-    // typing indicator logic
+    if (!socketConnected || !selectedChat) return;
+
+    if (!typingRef.current) {
+      typingRef.current = true;
+
+      socketRef.current.emit("typing", selectedChat._id);
+    }
+
+    clearTimeout(typingTimeoutRef.current);
+
+    typingTimeoutRef.current = setTimeout(() => {
+      socketRef.current.emit("stop typing", selectedChat._id);
+
+      typingRef.current = false;
+    }, 2000);
   };
+
   return (
-    <div className="flex h-full min-h-0 flex-col scrollbar-thumb-gray-300">
+    <div className="flex h-full min-h-0 flex-col">
       <div
         ref={chatContainerRef}
         className="flex-1 min-h-0 overflow-y-auto scrollbar scrollbar-w-2 scrollbar-thumb-rounded-full scrollbar-thumb-white/20 scrollbar-track-transparent hover:scrollbar-thumb-white/35"
       >
         {loading ? (
           <div className="flex h-full items-center justify-center">
-            <Loader2 className="h-12 w-12 md:h-16 md:w-16 animate-spin text-white" />
+            <Loader2 className="h-12 w-12 animate-spin text-white" />
           </div>
         ) : (
-          <div className="flex-1 min-h-0 p-3">
+          <div className="p-3">
             <ScrollableChat messages={messages} />
+
+            {isTyping && (
+              <div className="flex items-center gap-1 px-2 py-1">
+                <span className="h-2 w-2 rounded-full bg-white/60 animate-bounce" />
+                <span
+                  className="h-2 w-2 rounded-full bg-white/60 animate-bounce"
+                  style={{ animationDelay: "150ms" }}
+                />
+                <span
+                  className="h-2 w-2 rounded-full bg-white/60 animate-bounce"
+                  style={{ animationDelay: "300ms" }}
+                />
+              </div>
+            )}
           </div>
         )}
       </div>
 
-      <div className="flex-shrink-0 rounded-b-2xl bg-slate-950/40 border-t border-white/10 backdrop-blur-xl p-2">
-        <div className="flex items-center gap-3 rounded-3xl border border-white/10 bg-white/10 py-1 shadow-lg shadow-black/10 pl-2">
+      <div className="flex-shrink-0 rounded-b-2xl border-t border-white/10 bg-slate-950/40 p-2 backdrop-blur-xl">
+        <div className="flex items-center gap-3 rounded-3xl border border-white/10 bg-white/10 py-1 pl-2 shadow-lg shadow-black/10">
           <Textarea
             value={newMessage}
             onChange={typingHandler}
             disabled={loading}
             placeholder="Type a message..."
+            rows={1}
+            className="min-h-[40px] flex-1 resize-none border-none bg-transparent px-3 text-white placeholder:text-white/60 focus:ring-0"
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault(); // Prevent newline
+                e.preventDefault();
                 sendMessage();
               }
             }}
-            rows={1}
-            className="min-h-[40px] resize-none flex-1 min-w-0 rounded-2xl border-none bg-transparent px-3 text-white placeholder:text-white/60 focus:ring-0"
           />
 
           <Button
+            size="icon"
             disabled={loading || !newMessage.trim()}
             onClick={sendMessage}
-            size="icon"
             className="h-12 w-12 rounded-2xl bg-violet-600 text-white hover:bg-violet-500"
-            aria-label="Send message"
           >
             <Send className="h-5 w-5" />
           </Button>

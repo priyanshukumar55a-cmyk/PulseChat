@@ -43,17 +43,42 @@ const io = new Server(server, {
   },
 })
 
+// keep track of currently connected user ids
+let activeUsers = [];
+
 io.on("connection", (socket) => {
   console.log("connected to socket.io")
 
   socket.on('setup', (userData) => {
+    if (!userData || !userData._id) return;
+
     socket.join(userData._id);
-    socket.emit('connected')
+    socket.userId = userData._id;
+
+    // add to active users list
+    if (!activeUsers.includes(userData._id)) {
+      activeUsers.push(userData._id);
+    }
+
+    // notify this socket it's connected
+    socket.emit('connected');
+
+    // broadcast updated active users to all connected clients
+    io.emit('active users', activeUsers);
   })
 
   socket.on('join chat', (room) => {
-    socket.join(room);
     console.log('user joined room: ' + room)
+    socket.join(room);
+  })
+
+  socket.on('typing', (room) => {
+    console.log("typing started")
+    socket.in(room).emit('typing')
+  })
+  socket.on('stop typing', (room) => {
+    console.log("typing ended");
+    socket.in(room).emit('stop typing')
   })
 
   socket.on('new message', (newMessageReceived) => {
@@ -63,8 +88,20 @@ io.on("connection", (socket) => {
     chat.users.forEach(user => {
       if (user._id === newMessageReceived.sender._id) return;
 
-      socket.in(user._id).emit("message received", newMessageReceived)
+      socket.in(user._id).emit('message received', newMessageReceived)
     });
+  })
+
+  socket.on('disconnect', () => {
+    console.log("USER DISCONNECTED")
+
+    if (socket.userId) {
+      activeUsers = activeUsers.filter((id) => id !== socket.userId);
+      io.emit('active users', activeUsers);
+    }
+
+    // leave any rooms if needed
+    if (socket.userId) socket.leave(socket.userId);
   })
 })
 

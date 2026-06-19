@@ -34,7 +34,7 @@ const ScrollableChat = ({ messages }) => {
             >
               {!isSender && (
                 <div
-                  className={`${shouldShowAvatar && "w-10"} flex justify-center pt-2`}
+                  className={`${shouldShowAvatar && "w-10"} flex justify-center ${sameSenderAsPrev ? "pt-2" : "pt-4"}`}
                 >
                   {shouldShowAvatar && (
                     <Avatar className="h-8 w-8">

@@ -3,19 +3,41 @@ import { ArrowLeft, Send } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import ConnectedProfileModel from "./ConnectedProfileModel";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import UpdateGrpChatModal from "./UpdateGrpChatModal";
 import SingleChat from "./SingleChat";
 
+import { io } from "socket.io-client";
+const ENDPOINT = "http://localhost:3001";
+
 const ChatBox = () => {
   const chatRef = useRef();
-  const { selectedChat, setSelectedChat } = ChatState();
+  const {  selectedChat, setSelectedChat } = ChatState();
   const { user } = useAuth();
-  const [open, setOpen] = useState(false);
-  const chatDisplayUser = selectedChat?.isGroupChat
-    ? null
-    : selectedChat?.users?.find((u) => u._id !== user?._id);
+  const [active, setActive] = useState(false);
+
+  const otherUser =
+    !selectedChat?.isGroupChat && selectedChat?.users?.find((u) => u._id !== user?._id);
+
+  useEffect(() => {
+    if (!otherUser) return;
+
+    const socket = io(ENDPOINT, { transports: ["websocket"] });
+    socket.emit("setup", user);
+
+    const handleActive = (activeList) => {
+      if (!Array.isArray(activeList)) return;
+      setActive(activeList.includes(otherUser._id));
+    };
+
+    socket.on("active users", handleActive);
+
+    // optionally request current active users (server broadcasts on setup)
+
+    return () => {
+      socket.off("active users", handleActive);
+      socket.disconnect();
+    };
+  }, [otherUser, user]);
 
   return (
     <div className="h-full flex flex-col backdrop-blur-sm bg-white/5 border border-white/10 rounded-3xl">
@@ -34,7 +56,7 @@ const ChatBox = () => {
                 <span className="text-white font-bold text-lg">
                   {selectedChat?.isGroupChat
                     ? selectedChat.chatName?.[0]?.toUpperCase()
-                    : chatDisplayUser?.username?.[0]?.toUpperCase()}
+                    : otherUser?.username?.[0]?.toUpperCase()}
                 </span>
               </div>
 
@@ -42,18 +64,23 @@ const ChatBox = () => {
                 <h2 className="font-semibold text-white text-lg md:text-xl truncate">
                   {selectedChat?.isGroupChat
                     ? selectedChat.chatName
-                    : chatDisplayUser?.username}
+                    : otherUser?.username}
                 </h2>
 
-                <p className="text-xs text-white/60 mt-1">
-                  {selectedChat?.isGroupChat
-                    ? `${selectedChat?.users?.length} members`
-                    : "Active Now"}
-                </p>
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`h-2 w-2 rounded-full ${
+                      active ? "bg-green-500" : "bg-gray-500"
+                    }`}
+                  />
+                  <p className="text-xs text-white/60">
+                    {active ? "Active Now" : "Offline"}
+                  </p>
+                </div>
               </div>
               <div className="ml-auto">
                 {!selectedChat?.isGroupChat ? (
-                  <ConnectedProfileModel user={chatDisplayUser} />
+                  <ConnectedProfileModel user={otherUser} />
                 ) : (
                   <UpdateGrpChatModal
                     fetchMessages={() => chatRef.current?.fetchMessages()}
