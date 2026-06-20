@@ -132,16 +132,45 @@ const UpdateGrpChatModal = ({ fetchMessages }) => {
           </DialogTitle>
         </DialogHeader>
         <div className="flex flex-wrap gap-2">
-          {selectedChat?.users?.map((u) => (
-            <Badge
-              key={u._id}
-              onClick={() => handleRemoveUser(u)}
-              className="cursor-pointer rounded-md px-3 bg-gradient-to-r  from-violet-500  to-fuchsia-500  text-white hover:opacity-90 transition py-3"
-            >
-              {u.username}
-              <span className="ml-2 font-bold">×</span>
-            </Badge>
-          ))}
+          {selectedChat?.users?.map((u) => {
+            const isAdmin = selectedChat.groupAdmin._id === u._id;
+            const isYou = user._id === u._id;
+
+            return (
+              <Badge
+                key={u._id}
+                onClick={() => handleRemoveUser(u)}
+                className={`
+          cursor-pointer rounded-lg px-3 py-3.5 text-white transition
+          ${
+            isAdmin
+              ? "bg-amber-500 hover:bg-amber-400"
+              : isYou
+                ? "bg-emerald-600 hover:bg-emerald-500"
+                : "bg-gradient-to-r from-violet-500 to-fuchsia-500 hover:opacity-90"
+          }
+        `}
+              >
+                <div className="flex items-center gap-2">
+                  <span>{u.username}</span>
+
+                  {isAdmin && (
+                    <span className="rounded bg-white/20 px-1.5 py-0.5 text-[10px] font-semibold">
+                      👑 Admin
+                    </span>
+                  )}
+
+                  {!isAdmin && isYou && (
+                    <span className="rounded bg-white/20 px-1.5 py-0.5 text-[10px] font-semibold">
+                      You
+                    </span>
+                  )}
+
+                  <span className="ml-1 font-bold">×</span>
+                </div>
+              </Badge>
+            );
+          })}
         </div>
         <div className="flex gap-2">
           <Input
