@@ -13,7 +13,6 @@ const { notFound, errorHandler } = require("./middlewares/errorMiddleware");
 const userRouter = require("./Routes/userRoutes");
 const chatRoutes = require("./routes/chatRoutes");
 const messageRouters = require("./routes/messageRoutes");
-const upload = require("./middlewares/upload");
 const uploadRoutes = require("./routes/uploadRoutes");
 require("colors");
 dotenv.config();

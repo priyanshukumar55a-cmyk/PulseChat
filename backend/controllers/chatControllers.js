@@ -109,7 +109,7 @@ const renameGroup = asyncHandler(async (req, res) => {
       chatName,
     },
     {
-      new: true,
+      returnDocument: "after",
     },
   )
     .populate("users", "-password")
@@ -131,7 +131,7 @@ const addToGroup = asyncHandler(async (req, res) => {
     {
       $push: { users: userId },
     },
-    { new: true },
+    { returnDocument: "after" },
   )
     .populate("users", "-password")
     .populate("groupAdmin", "-password");
@@ -152,7 +152,7 @@ const removeFromGroup = asyncHandler(async (req, res) => {
     {
       $pull: { users: userId },
     },
-    { new: true },
+    { returnDocument: "after" },
   )
     .populate("users", "-password")
     .populate("groupAdmin", "-password");

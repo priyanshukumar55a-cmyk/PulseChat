@@ -3,7 +3,7 @@ const upload = require("../middlewares/upload");
 const cloudinary = require("../config/cloudinary");
 const uploadRoutes = express.Router();
 
-uploadRoutes.post("/upload", upload.single("image"), async (req, res) => {
+uploadRoutes.post("/", upload.single("image"), async (req, res) => {
   try {
     const file = req.file;
 

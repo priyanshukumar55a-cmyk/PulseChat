@@ -4,14 +4,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
+import api from "@/api/axios";
+import { toast } from "sonner";
 
 const Settings = () => {
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
   const fileInputRef = useRef(null);
   const [username, setUsername] = useState(user ? user.username : "");
   const [email, setEmail] = useState(user ? user.email : "");
   const [profilePic, setProfilePic] = useState(
-    user?.pic || user?.username?.[0].toUpperCase(),
+    user?.pic || user?.username?.[0].toUpperCase() || "",
   );
   const [selectedFile, setSelectedFile] = useState(null);
 
@@ -25,6 +27,52 @@ const Settings = () => {
 
     setSelectedFile(file);
     setProfilePic(URL.createObjectURL(file));
+  };
+
+  const uploadImage = async (file) => {
+    const formData = new FormData();
+
+    formData.append("image", file);
+
+    const { data } = await api.post("/upload", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+      
+      return data.url;
+  };
+
+  const handleSave = async () => {
+    try {
+      let imageUrl = user.pic;
+      if (selectedFile) {
+          imageUrl = await uploadImage(selectedFile);
+          console.log("pic =", imageUrl);
+          console.log(typeof imageUrl);
+      }
+      const { data } = await api.put(
+        "/user/profile",
+        {
+          username,
+          email,
+          pic: imageUrl,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        },
+      );
+
+      setUser(data);
+
+      localStorage.setItem("userInfo", JSON.stringify(data));
+
+      toast.success("Profile updated successfully");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to update profile");
+    }
   };
 
   return (
@@ -81,7 +129,9 @@ const Settings = () => {
               />
             </div>
 
-            <Button>Save Changes</Button>
+            <Button className="cursor-pointer" onClick={handleSave}>
+              Save Changes
+            </Button>
           </CardContent>
         </Card>
 
