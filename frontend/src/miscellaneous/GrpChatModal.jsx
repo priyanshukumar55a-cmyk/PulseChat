@@ -87,13 +87,13 @@ const GrpChatModal = ({ setOpen }) => {
 
       <div className="relative flex flex-col gap-4 py-4">
         <Input
-          className="border-purple-400 px-4 py-5"
+          className="border-purple-400 px-4 py-5 w-full"
           placeholder="Group name"
           value={grpChatName}
           onChange={(e) => setGrpChatName(e.target.value)}
         />
         <Input
-          className="border-purple-400 px-4 py-5"
+          className="border-purple-400 px-4 py-5 w-full"
           placeholder="Search users by name or email"
           value={search}
           onChange={(e) => handleSearch(e.target.value)}
@@ -128,35 +128,22 @@ const GrpChatModal = ({ setOpen }) => {
               <div
                 key={user._id}
                 onClick={() => handleGroup(user)}
-                className="w-full flex items-center justify-between gap-3 px-4 py-2 transition border-2 rounded-md border-black/15 bg-cyan-300 cursor-pointer"
+                className="w-full flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-2 transition border-2 rounded-md border-black/15 bg-cyan-300 cursor-pointer"
               >
-                <div className="flex items-center gap-3 text-left w-full">
-                  <Avatar className="h-8 w-8">
+                <div className="flex items-center gap-3 text-left flex-1 min-w-0">
+                  <Avatar className="h-8 w-8 flex-shrink-0">
                     <AvatarImage src={user?.pic} alt={user?.username} />
                     <AvatarFallback>
                       {user?.username?.[0]?.toUpperCase() || "U"}
                     </AvatarFallback>
                   </Avatar>
 
-                  <div className="flex-1">
-                    <p className="font-medium">{user.username}</p>
-                    <p className="text-xs text-muted-foreground">
+                  <div className="min-w-0">
+                    <p className="font-medium truncate">{user.username}</p>
+                    <p className="text-xs text-muted-foreground truncate">
                       {user.email}
                     </p>
                   </div>
-                </div>
-
-                <div className="flex-shrink-0 ml-3">
-                  <Button
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleGroup(user);
-                    }}
-                    className="bg-violet-600 hover:bg-violet-500 text-white cursor-pointer"
-                  >
-                    Add
-                  </Button>
                 </div>
               </div>
             );

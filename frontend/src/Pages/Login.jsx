@@ -46,7 +46,6 @@ export default function Login() {
 
         toast.success("Login Successfull!");
         login(res.data)  // save in AuthContext
-        console.log(res.data);
         navigate("/");
       } catch (err) {
         toast.error(

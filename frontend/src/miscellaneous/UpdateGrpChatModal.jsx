@@ -121,7 +121,7 @@ const UpdateGrpChatModal = ({ fetchMessages }) => {
       <DialogTrigger asChild>
         <Button className="py-5 px-3 bg-fuchsia-500 hover:bg-fuchsia-500/70 cursor-pointer">
           <Pencil className="h-5 w-5" />
-          Update Group
+          <div className="hidden sm:flex">Update Group</div>
         </Button>
       </DialogTrigger>
 

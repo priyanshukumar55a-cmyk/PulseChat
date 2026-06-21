@@ -16,6 +16,7 @@ const Settings = () => {
     user?.pic || user?.username?.[0].toUpperCase() || "",
   );
   const [selectedFile, setSelectedFile] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -24,6 +25,10 @@ const Settings = () => {
   const handleImageChange = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image must be less than 5 MB");
+      return;
+    }
 
     setSelectedFile(file);
     setProfilePic(URL.createObjectURL(file));
@@ -39,17 +44,18 @@ const Settings = () => {
         "Content-Type": "multipart/form-data",
       },
     });
-      
-      return data.url;
+
+    return data.url;
   };
 
   const handleSave = async () => {
     try {
+      setLoading(true);
       let imageUrl = user.pic;
       if (selectedFile) {
-          imageUrl = await uploadImage(selectedFile);
-          console.log("pic =", imageUrl);
-          console.log(typeof imageUrl);
+        imageUrl = await uploadImage(selectedFile);
+        console.log("pic =", imageUrl);
+        console.log(typeof imageUrl);
       }
       const { data } = await api.put(
         "/user/profile",
@@ -72,6 +78,9 @@ const Settings = () => {
       toast.success("Profile updated successfully");
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to update profile");
+    } finally {
+      URL.revokeObjectURL(profilePic);
+      setLoading(false);
     }
   };
 
@@ -129,8 +138,12 @@ const Settings = () => {
               />
             </div>
 
-            <Button className="cursor-pointer" onClick={handleSave}>
-              Save Changes
+            <Button
+              className="cursor-pointer"
+              onClick={handleSave}
+              disabled={loading}
+            >
+              {loading ? "Saving..." : "Save Changes"}
             </Button>
           </CardContent>
         </Card>

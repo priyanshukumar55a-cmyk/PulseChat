@@ -7,16 +7,17 @@ import UpdateGrpChatModal from "./UpdateGrpChatModal";
 import SingleChat from "./SingleChat";
 
 import { useSocket } from "@/context/SocketProvider";
-import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const ChatBox = () => {
-   const { activeUsers } = useSocket()
+  const { activeUsers } = useSocket();
   const chatRef = useRef();
-  const {  selectedChat, setSelectedChat } = ChatState();
+  const { selectedChat, setSelectedChat } = ChatState();
   const { user } = useAuth();
   const otherUser =
-    !selectedChat?.isGroupChat && selectedChat?.users?.find((u) => u._id !== user?._id);
-  const active = activeUsers.includes(otherUser?._id)
+    !selectedChat?.isGroupChat &&
+    selectedChat?.users?.find((u) => u._id !== user?._id);
+  const active = activeUsers.includes(otherUser?._id);
 
   return (
     <div className="h-full flex flex-col backdrop-blur-sm bg-white/5 border border-white/10 rounded-3xl">
@@ -37,7 +38,7 @@ const ChatBox = () => {
                     selectedChat.chatName?.[0]?.toUpperCase()
                   ) : (
                     <Avatar className="h-11 w-11">
-                      <AvatarImage src={otherUser?.pic || defaultAvatar} />
+                      <AvatarImage src={otherUser?.pic} />
                       <AvatarFallback>
                         {otherUser?.username?.[0]?.toUpperCase()}
                       </AvatarFallback>

@@ -9,11 +9,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ChatState } from "@/context/chatProvider";
-import { useEffect } from "react";
 
 export default function Notifications() {
-  const { notifications, selectedChat, setSelectedChat, setNotifications } = ChatState();
-  console.log("notifications:", notifications);
+  const { notifications, setSelectedChat, setNotifications } = ChatState();
 
   const handleNotificationClick = (notification) => {
     setSelectedChat(notification.chat);
