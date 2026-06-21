@@ -147,7 +147,7 @@ export default function Login() {
 
                 <button
                   type="button"
-                  className="text-indigo-400 hover:text-indigo-300 font-medium hover:cursor-pointer"
+                  className="text-orange-400 hover:text-orange-300 font-medium hover:cursor-pointer"
                 >
                   Forgot Password?
                 </button>

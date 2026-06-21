@@ -1,5 +1,5 @@
-const generateToken = require('../config/generateToken');
-const User = require('../models/userModel');
+const generateToken = require("../config/generateToken");
+const User = require("../models/userModel");
 const asyncHandler = require("express-async-handler");
 
 const registerUser = asyncHandler(async (req, res) => {
@@ -27,11 +27,12 @@ const registerUser = asyncHandler(async (req, res) => {
     _id: user._id,
     username: user.username,
     email: user.email,
+    pic: user.pic,
     token: generateToken(user._id),
   });
 });
 
-const loginUser = asyncHandler (async (req, res) => {
+const loginUser = asyncHandler(async (req, res) => {
   const email = req.body.email?.trim().toLowerCase();
   const { password, rememberMe } = req.body;
 
@@ -42,6 +43,7 @@ const loginUser = asyncHandler (async (req, res) => {
       _id: user._id,
       username: user.username,
       email: user.email,
+      pic: user.pic,
       token: generateToken(user._id, rememberMe),
     });
   }

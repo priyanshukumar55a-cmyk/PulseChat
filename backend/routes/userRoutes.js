@@ -1,13 +1,17 @@
 const express = require("express");
 const { registerUser, loginUser } = require("../controllers/authControllers");
 const { body } = require("express-validator");
-const getAllUsers = require("../controllers/userControllers");
+const {
+  getAllUsers,
+  updateProfile,
+} = require("../controllers/userControllers");
 const { protect } = require("../middlewares/authmiddleware");
 const userRouter = express.Router();
 
-userRouter.get("/",protect, getAllUsers);
+userRouter.get("/", protect, getAllUsers);
 userRouter.get("/profile", protect, (req, res) => {
-    return res.json(req.user)
+  return res.json(req.user);
 });
+userRouter.put("/profile", protect, updateProfile);
 
 module.exports = userRouter;

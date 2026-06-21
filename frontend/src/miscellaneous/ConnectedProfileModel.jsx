@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
+import { MoreVertical } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -18,9 +19,11 @@ const ConnectedProfileModel = ({ user }) => {
       <DialogTrigger asChild>
         <Button
           variant="outline"
-          className="border-white/20 text-white px-4 py-5 bg-fuchsia-500 hover:cursor-pointer hover:bg-fuchsia-600 hover:text-black/65"
+          aria-label="View profile"
+          className="border-white/20 text-white px-3 py-2 sm:px-4 sm:py-5 bg-fuchsia-500 hover:cursor-pointer hover:bg-fuchsia-600 hover:text-black/65 flex items-center justify-center gap-2"
         >
-          View Profile
+          <span className="hidden sm:inline">View Profile</span>
+          <MoreVertical className="sm:hidden w-5 h-5" />
         </Button>
       </DialogTrigger>
       <DialogContent className="bg-black/60 backdrop-blur-2xl border border-white/10 text-white">

@@ -18,4 +18,39 @@ const getAllUsers = asyncHandler(async (req, res) => {
     res.send(users);
 });
 
-module.exports = getAllUsers;
+const updateProfile = asyncHandler(async (req, res) => {
+  const { username, email, pic } = req.body;
+
+  const user = await User.findById(req.user._id);
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  //check email uniqueness if changed
+  if (email && email !== user.email) {
+    const existingUser = await User.findOne({ email });
+
+    if (existingUser) {
+      res.status(400);
+      throw new Error("Email already exists");
+    }
+  }
+
+  if (username !== undefined) user.username = username;
+  if (email !== undefined) user.email = email;
+  if (pic !== undefined) user.pic = pic;
+
+  const updatedUser = await user.save();
+
+  res.json({
+    _id: updatedUser._id,
+    username: updatedUser.username,
+    email: updatedUser.email,
+    pic: updatedUser.pic,
+    token: generateToken(updatedUser._id),
+  });
+})
+
+module.exports = {getAllUsers, updateProfile};

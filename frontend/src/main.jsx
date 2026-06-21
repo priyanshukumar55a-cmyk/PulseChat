@@ -7,6 +7,7 @@ import HomePage from "./Pages/HomePage";
 import ChatPage from "./Pages/ChatPage";
 import Login from "./Pages/Login";
 import Signup from "./Pages/Signup";
+import Settings from "./Pages/Settings";
 
 const router = createBrowserRouter([
   {
@@ -28,6 +29,9 @@ const router = createBrowserRouter([
       {
         path: "signup",
         element: <Signup />,
+      }, {
+        path: "settings",
+        element: <Settings/>
       },
     ],
   },

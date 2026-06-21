@@ -1,19 +1,21 @@
-const path = require('path');
-const http = require('http');
-const express = require('express');
+const path = require("path");
+const http = require("http");
+const express = require("express");
 const app = express();
 const server = http.createServer(app);
-const {Server} = require("socket.io")
-const dotenv = require('dotenv');
-const connectDB = require('./config/db');
-const authRouter = require('./routes/authRoutes');
+const { Server } = require("socket.io");
+const dotenv = require("dotenv");
+const connectDB = require("./config/db");
+const authRouter = require("./routes/authRoutes");
 const cors = require("cors");
 
-const { notFound, errorHandler } = require('./middlewares/errorMiddleware');
-const userRouter = require('./Routes/userRoutes');
-const chatRoutes = require('./routes/chatRoutes');
-const messageRouters = require('./routes/messageRoutes');
-require('colors');
+const { notFound, errorHandler } = require("./middlewares/errorMiddleware");
+const userRouter = require("./Routes/userRoutes");
+const chatRoutes = require("./routes/chatRoutes");
+const messageRouters = require("./routes/messageRoutes");
+const upload = require("./middlewares/upload");
+const uploadRoutes = require("./routes/uploadRoutes");
+require("colors");
 dotenv.config();
 
 connectDB();
@@ -24,16 +26,16 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/api/user", authRouter);
-app.use('/api/user', userRouter)
-app.use("/api/chat", chatRoutes)
-app.use("/api/message", messageRouters)
+app.use("/api/user", userRouter);
+app.use("/api/chat", chatRoutes);
+app.use("/api/message", messageRouters);
+app.use("/api/upload", uploadRoutes);
 
 app.use(notFound);
-app.use(errorHandler)
-
+app.use(errorHandler);
 
 // Serve static files from the React app
-app.use(express.static(path.join(__dirname, '../frontend/build')));
+app.use(express.static(path.join(__dirname, "../frontend/build")));
 
 const io = new Server(server, {
   pingTimeout: 60000,
@@ -41,15 +43,15 @@ const io = new Server(server, {
     origin: "http://localhost:5173",
     methods: ["GET", "POST"],
   },
-})
+});
 
 // keep track of currently connected user ids
 let activeUsers = [];
 
 io.on("connection", (socket) => {
-  console.log("connected to socket.io")
+  console.log("connected to socket.io");
 
-  socket.on('setup', (userData) => {
+  socket.on("setup", (userData) => {
     if (!userData || !userData._id) return;
 
     socket.join(userData._id);
@@ -61,54 +63,45 @@ io.on("connection", (socket) => {
     }
 
     // notify this socket it's connected
-    socket.emit('connected');
+    socket.emit("connected");
 
     // broadcast updated active users to all connected clients
-    io.emit('active users', activeUsers);
-  })
+    io.emit("active users", activeUsers);
+  });
 
-  socket.on('join chat', (room) => {
-    console.log('user joined room: ' + room)
+  socket.on("join chat", (room) => {
+    console.log("user joined room: " + room);
     socket.join(room);
-  })
+  });
 
-  socket.on('typing', (room) => {
-    console.log("typing started")
-    socket.in(room).emit('typing')
-  })
-  socket.on('stop typing', (room) => {
-    console.log("typing ended");
-    socket.in(room).emit('stop typing')
-  })
+  socket.on("typing", (room) => {
+    socket.in(room).emit("typing");
+  });
+  socket.on("stop typing", (room) => {
+    socket.in(room).emit("stop typing");
+  });
 
-  socket.on('new message', (newMessageReceived) => {
+  socket.on("new message", (newMessageReceived) => {
     var chat = newMessageReceived.chat;
-    if (!chat.users) return console.log("chat.users is not defined")
-    
-      console.log("NEW MESSAGE");
-      console.log(newMessageReceived.content);
-      console.log(newMessageReceived.chat._id);
-    
-    chat.users.forEach(user => {
+    if (!chat.users) return console.log("chat.users is not defined");
+
+    chat.users.forEach((user) => {
       if (user._id === newMessageReceived.sender._id) return;
 
-      socket.in(user._id).emit('message received', newMessageReceived)
-      console.log(`Sent message to ${user._id}`);
+      socket.in(user._id).emit("message received", newMessageReceived);
     });
-  })
+  });
 
-  socket.on('disconnect', () => {
-    console.log("USER DISCONNECTED")
-
+  socket.on("disconnect", () => {
     if (socket.userId) {
       activeUsers = activeUsers.filter((id) => id !== socket.userId);
-      io.emit('active users', activeUsers);
+      io.emit("active users", activeUsers);
     }
 
     // leave any rooms if needed
     if (socket.userId) socket.leave(socket.userId);
-  })
-})
+  });
+});
 
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`.green.bold);
