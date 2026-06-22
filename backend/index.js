@@ -10,7 +10,7 @@ const authRouter = require("./routes/authRoutes");
 const cors = require("cors");
 
 const { notFound, errorHandler } = require("./middlewares/errorMiddleware");
-const userRouter = require("./Routes/userRoutes");
+const userRouter = require("./routes/userRoutes");
 const chatRoutes = require("./routes/chatRoutes");
 const messageRouters = require("./routes/messageRoutes");
 const uploadRoutes = require("./routes/uploadRoutes");
