@@ -1,6 +1,5 @@
 import React, { useRef, useState } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
@@ -54,8 +53,6 @@ const Settings = () => {
       let imageUrl = user.pic;
       if (selectedFile) {
         imageUrl = await uploadImage(selectedFile);
-        console.log("pic =", imageUrl);
-        console.log(typeof imageUrl);
       }
       const { data } = await api.put(
         "/user/profile",
@@ -85,25 +82,35 @@ const Settings = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto mt-20 px-4">
-      <div className="max-w-2xl mx-auto p-6 space-y-6">
-        <h1 className="text-3xl font-bold">Settings</h1>
+    <div className="h-full mt-20 px-4 py-8">
+      <div className="max-w-2xl mx-auto space-y-6">
+        {/* <div>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-400 via-purple-400 to-blue-400 bg-clip-text text-transparent">
+            Settings
+          </h1>
+          <p className="text-white/60 mt-2">
+            Manage your profile and preferences
+          </p>
+        </div> */}
 
-        {/* Profile Settings */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Profile</CardTitle>
-          </CardHeader>
+        {/* Profile Settings Card */}
+        <div className="bg-black/60 backdrop-blur-2xl border border-white/10 rounded-2xl p-8 space-y-6">
+          <h2 className="text-2xl font-semibold text-white justify-center flex">Profile Settings</h2>
 
-          <CardContent className="space-y-6">
-            <div className="flex flex-col items-center gap-3">
-              <Avatar className="h-24 w-24">
+          {/* Avatar Section */}
+          <div className="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-white/10">
+            <div className="flex-shrink-0">
+              <Avatar className="h-24 w-24 ring-2 ring-purple-500/50">
                 <AvatarImage src={profilePic} />
-                <AvatarFallback>
+                <AvatarFallback className="bg-gradient-to-br from-violet-500 to-purple-600 text-white text-lg font-bold">
                   {user?.username?.[0]?.toUpperCase()}
                 </AvatarFallback>
               </Avatar>
+            </div>
 
+            <div className="flex-1 text-center sm:text-left">
+              <p className="text-white font-semibold">{username}</p>
+              <p className="text-white/60 text-sm mb-3">{email}</p>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -111,74 +118,49 @@ const Settings = () => {
                 className="hidden"
                 onChange={handleImageChange}
               />
-
               <Button
-                className="cursor-pointer"
-                variant="outline"
+                className="cursor-pointer bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white border-0"
                 onClick={() => fileInputRef.current?.click()}
               >
                 Change Photo
               </Button>
             </div>
+          </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Username</label>
+          {/* Form Section */}
+          <div className="space-y-5">
+            <div>
+              <label className="text-sm font-medium text-white/80 block mb-2">
+                Username
+              </label>
               <Input
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
+                className="bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:ring-purple-500/50 focus:border-purple-500/50"
               />
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Email</label>
+            <div>
+              <label className="text-sm font-medium text-white/80 block mb-2">
+                Email
+              </label>
               <Input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                className="bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:ring-purple-500/50 focus:border-purple-500/50"
               />
             </div>
 
             <Button
-              className="cursor-pointer"
+              className="w-full cursor-pointer bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white border-0 py-6 text-base font-semibold shadow-lg"
               onClick={handleSave}
               disabled={loading}
             >
               {loading ? "Saving..." : "Save Changes"}
             </Button>
-          </CardContent>
-        </Card>
-
-        {/* Password Section */}
-        {/* <Card>
-          <CardHeader>
-            <CardTitle>Change Password</CardTitle>
-          </CardHeader>
-
-          <CardContent className="space-y-4">
-            <Input
-              type="password"
-              placeholder="Current Password"
-              value={currentPassword}
-              onChange={(e) => setCurrentPassword(e.target.value)}
-            />
-
-            <Input
-              type="password"
-              placeholder="New Password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-            />
-
-            <Input
-              type="password"
-              placeholder="Confirm New Password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-            />
-
-            <Button>Update Password</Button>
-          </CardContent>
-        </Card> */}
+          </div>
+        </div>
       </div>
     </div>
   );

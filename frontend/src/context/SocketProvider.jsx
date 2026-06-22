@@ -3,7 +3,7 @@ import { useAuth } from "./AuthContext";
 import { io } from "socket.io-client";
 
 const SocketContext = createContext();
-const ENDPOINT = "http://localhost:3001";
+const ENDPOINT = import.meta.env.VITE_API_URL;
 
 export const SocketProvider = ({ children }) => {
   const { user } = useAuth();
