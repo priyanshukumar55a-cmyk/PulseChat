@@ -21,7 +21,12 @@ connectDB();
 
 const PORT = process.env.PORT || 3001;
 
-app.use(cors());
+app.use(
+  cors({
+    origin: ["http://localhost:5173", process.env.CLIENT_URL],
+    credentials: true,
+  }),
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/api/user", authRouter);
@@ -39,7 +44,7 @@ app.use(express.static(path.join(__dirname, "../frontend/build")));
 const io = new Server(server, {
   pingTimeout: 60000,
   cors: {
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", process.env.CLIENT_URL],
     methods: ["GET", "POST"],
   },
 });
@@ -48,7 +53,7 @@ const io = new Server(server, {
 let activeUsers = [];
 
 io.on("connection", (socket) => {
-  console.log("connected to socket.io");
+  console.log(`Socket connected: ${socket.id}`);
 
   socket.on("setup", (userData) => {
     if (!userData || !userData._id) return;
