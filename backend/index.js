@@ -50,27 +50,26 @@ const io = new Server(server, {
 });
 
 // keep track of currently connected user ids
-let activeUsers = [];
+let activeUsers = new Map();
 
 io.on("connection", (socket) => {
   console.log(`Socket connected: ${socket.id}`);
 
   socket.on("setup", (userData) => {
-    if (!userData || !userData._id) return;
+    if (!userData || !userData?._id) return;
 
     socket.join(userData._id);
     socket.userId = userData._id;
 
-    // add to active users list
-    if (!activeUsers.includes(userData._id)) {
-      activeUsers.push(userData._id);
-    }
+    // update the count in map
+    const count = activeUsers.get(userData._id) || 0;
+    activeUsers.set(userData._id, count + 1);
 
     // notify this socket it's connected
     socket.emit("connected");
 
     // broadcast updated active users to all connected clients
-    io.emit("active users", activeUsers);
+    io.emit("active users", [...activeUsers.keys()]);
   });
 
   socket.on("join chat", (room) => {
@@ -97,9 +96,15 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    if (socket.userId) {
-      activeUsers = activeUsers.filter((id) => id !== socket.userId);
-      io.emit("active users", activeUsers);
+    if (socket?.userId) {
+      const count = activeUsers.get(socket.userId);
+
+      if (count <= 1) {
+        activeUsers.delete(socket.userId);
+      } else {
+        activeUsers.set(socket.userId, count - 1);
+      }
+      io.emit("active users", [...activeUsers.keys()]);
     }
 
     // leave any rooms if needed

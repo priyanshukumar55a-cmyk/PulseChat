@@ -20,6 +20,10 @@ export const SocketProvider = ({ children }) => {
       newSocket.emit("setup", user);
     });
 
+    newSocket.on("reconnect", () => {
+      newSocket.emit("setup", user);
+    });
+
     newSocket.on("disconnect", () => {
       setConnected(false);
     });
