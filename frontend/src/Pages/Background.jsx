@@ -1,15 +1,18 @@
 import React from "react";
-import bgImage from "../assets/chat-background.jpg";
+import "./Background.css";
 
 const Background = () => {
   return (
-    <div className="fixed inset-0 -z-10">
-      <img
-        src={bgImage}
-        alt="Background"
-        className="w-full h-full object-cover"
-      />
-      <div className="absolute inset-0 bg-black/10" />
+    <div className=" body-bg">
+      <div className="circle c1"></div>
+      <div className="circle c2"></div>
+      <div className="circle c3"></div>
+      <div className="circle c4"></div>
+      <div className="overlay"></div>
+
+      {Array.from({ length: 8 }).map((_, i) => (
+        <div key={i} className={`dot-grid grid${i + 1}`}></div>
+      ))}
     </div>
   );
 };
