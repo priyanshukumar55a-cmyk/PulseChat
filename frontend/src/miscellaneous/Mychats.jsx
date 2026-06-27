@@ -34,7 +34,7 @@ const Mychats = () => {
   }, []);
 
   return (
-    <div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-3xl p-3.5 md:p-4 shadow-xl h-[calc(100vh-4.3rem)] flex flex-col">
+    <div className="backdrop-blur-sm bg-white/5 border border-white/10 sm:rounded-3xl p-3.5 md:p-4 shadow-xl h-full flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-semibold text-white">My Chats</h2>
@@ -54,9 +54,9 @@ const Mychats = () => {
       </div>
       {/* Loading */}
       {/* Search (authenticated only) */}
-        <div className="sm:hidden mt-0.5 mb-3 ml-1">
-          {isAuthenticated && <SearchBox />}
-        </div>
+      <div className="sm:hidden mt-0.5 mb-3 ml-1">
+        {isAuthenticated && <SearchBox />}
+      </div>
       <div className="overflow-y-auto scrollbar-none flex-1">
         {loading ? (
           <div className="flex flex-col gap-3">

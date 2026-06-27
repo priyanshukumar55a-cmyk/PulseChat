@@ -202,7 +202,7 @@ const SingleChat = forwardRef((props, ref) => {
         )}
       </div>
 
-      <div className="flex-shrink-0 rounded-b-2xl border-t border-white/10 bg-slate-950/40 p-2 backdrop-blur-xl">
+      <div className="flex-shrink-0 sm:rounded-b-2xl border-t border-white/10 bg-slate-950/40 p-2 backdrop-blur-xl">
         <div className="flex items-center gap-3 rounded-3xl border border-white/10 bg-white/10 py-1 pl-2 shadow-lg shadow-black/10">
           <Textarea
             value={newMessage}

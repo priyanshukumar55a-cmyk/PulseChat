@@ -20,7 +20,7 @@ const ChatBox = () => {
   const active = activeUsers.includes(otherUser?._id);
 
   return (
-    <div className="h-full flex flex-col backdrop-blur-sm bg-white/5 border border-white/10 rounded-3xl">
+    <div className="h-full flex flex-col backdrop-blur-sm bg-white/5 border border-white/10 sm:rounded-3xl">
       {selectedChat ? (
         <div className="flex-1 min-h-0 flex flex-col">
           <div className="border-b border-white/15 px-4 py-3">
