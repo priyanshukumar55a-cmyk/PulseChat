@@ -9,12 +9,12 @@ const ChatPage = () => {
   const { selectedChat } = ChatState();
 
   return (
-    <div className="pt-14 md:pt-18 h-dvh overflow-y-hidden">
+    <div className="pt-14 md:pt-18 overflow-hidden">
       {user && (
         <>
           {/* mobile */}
           <div
-            className="md:hidden h-[calc(100dvh-3.5rem)] w-full overflow-y-hidden scrollbar-none"
+            className="md:hidden h-[calc(100dvh-3.5rem)] min-h-0 w-full overflow-y-hidden scrollbar-none"
             style={{ touchAction: "pan-y" }}
           >
             {!selectedChat ? <Mychats /> : <ChatBox />}
