@@ -34,7 +34,7 @@ const Mychats = () => {
   }, []);
 
   return (
-    <div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-3xl p-4 shadow-xl h-[calc(100vh-5rem)] flex flex-col">
+    <div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-3xl p-3.5 md:p-4 shadow-xl h-[calc(100vh-4.3rem)] flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-semibold text-white">My Chats</h2>

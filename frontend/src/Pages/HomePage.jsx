@@ -1,4 +1,5 @@
 import { useAuth } from "@/context/AuthContext";
+import { Loader2 } from "lucide-react";
 import React, { useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -13,7 +14,17 @@ const HomePage = () => {
   }, [loading, isAuthenticated]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="relative min-h-screen overflow-hidden">
+        <div className="relative z-10 flex items-center justify-center min-h-screen">
+          <div className="text-center text-white">
+            <h1 className="text-6xl font-bold">
+              <Loader2 className="animate-spin size-20"></Loader2>
+            </h1>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (!isAuthenticated) {

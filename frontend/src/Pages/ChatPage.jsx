@@ -2,18 +2,21 @@ import { useAuth } from "@/context/AuthContext";
 import { ChatState } from "@/context/chatProvider";
 import ChatBox from "@/miscellaneous/ChatBox";
 import Mychats from "@/miscellaneous/Mychats";
-import React, { useEffect } from "react";
+import React from "react";
 
 const ChatPage = () => {
   const { user } = useAuth();
   const { selectedChat } = ChatState();
 
   return (
-    <div className="mt-18 h-[calc(100vh-5rem)] flex gap-3 px-3">
+    <div
+      className="mt-16 h-[calc(100vh-4.2rem)] flex gap-3 px-3 overflow-x-hidden"
+      style={{ touchAction: "pan-y" }}
+    >
       {user && (
         <>
           {/* mobile */}
-          <div className="md:hidden h-full w-full">
+          <div className="md:hidden h-full w-full overflow-x-hidden">
             {!selectedChat ? <Mychats /> : <ChatBox />}
           </div>
 

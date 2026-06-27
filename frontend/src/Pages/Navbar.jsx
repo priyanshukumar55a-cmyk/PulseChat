@@ -7,7 +7,7 @@ import ProfileMenu from "@/components/navbar/ProfileMenu";
 import Notifications from "@/components/navbar/Notifications";
 
 export default function Navbar() {
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   const navigate = useNavigate();
 
