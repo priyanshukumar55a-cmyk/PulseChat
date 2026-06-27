@@ -103,7 +103,7 @@ export default function Signup() {
   };
 
   return (
-    <div className="relative flex items-center justify-center px-4 py-6 mt-16 min-h-[calc(100vh-4rem)]">
+    <div className="relative flex items-center justify-center px-4 py-6 mt-10 min-h-[calc(100vh-4rem)]">
       <div className="relative z-10 w-full max-w-3xl px-4">
         <div
           className={

@@ -9,12 +9,12 @@ const ChatPage = () => {
   const { selectedChat } = ChatState();
 
   return (
-    <div className="mt-14 md:mt-18">
+    <div className="mt-14 md:mt-18 h-dvh overflow-y-hidden">
       {user && (
         <>
           {/* mobile */}
           <div
-            className="md:hidden h-[calc(100vh-3.5rem)] w-full overflow-x-hidden"
+            className="md:hidden h-[calc(100vh-3.5rem)] w-full overflow-y-hidden fixed scrollbar-none"
             style={{ touchAction: "pan-y" }}
           >
             {!selectedChat ? <Mychats /> : <ChatBox />}
@@ -22,7 +22,7 @@ const ChatPage = () => {
 
           {/* desktop */}
           <div
-            className="hidden md:flex h-[calc(100vh-5rem)] w-full gap-3 px-3"
+            className="hidden md:flex h-[calc(100vh-5rem)] w-full gap-3 px-3 fixed"
             style={{ touchAction: "pan-y" }}
           >
             <div className="w-[350px] lg:w-[400px] flex-shrink-0">

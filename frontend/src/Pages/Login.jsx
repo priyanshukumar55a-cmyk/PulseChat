@@ -57,7 +57,7 @@ export default function Login() {
     };
 
   return (
-    <div className="relative flex items-center justify-center px-4 mt-16 min-h-[calc(100vh-4rem)] overflow-hidden">
+    <div className="relative flex items-center justify-center px-4 mt-12 min-h-[calc(100vh-4rem)] overflow-hidden">
       <div className="relative z-10 w-140 max-w-3xl px-4">
         <div className="backdrop-blur-2xl border border-white/20 rounded-3xl p-6 md:px-8 shadow-2xl max-h-[calc(100vh-6rem)]">
           <div className="overflow-y-auto max-h-[calc(100vh-9rem)] pr-2">
