@@ -176,7 +176,6 @@ const SingleChat = forwardRef((props, ref) => {
       <div
         ref={chatContainerRef}
         className="flex-1 min-h-0 overflow-y-auto scrollbar scrollbar-w-2 scrollbar-thumb-rounded-full scrollbar-thumb-white/20 scrollbar-track-transparent hover:scrollbar-thumb-white/35"
-        style={{ overscrollBehavior: "contain" }}
       >
         {loading ? (
           <div className="flex h-full items-center justify-center">

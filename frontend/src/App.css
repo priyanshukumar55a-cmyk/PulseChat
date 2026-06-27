@@ -6,9 +6,14 @@
     background-position: center;
     opacity: 0.9;
 } */
+:root {
+  --vvh: 100vh;
+}
 html,
 body,
 #root {
   height: 100%;
   overflow: hidden;
+  position: fixed;
+  width: 100%;
 }

@@ -14,8 +14,11 @@ const ChatPage = () => {
         <>
           {/* mobile */}
           <div
-            className="md:hidden fixed inset-x-0 top-[3.5rem] bottom-0 w-full overflow-hidden scrollbar-none"
-            style={{ touchAction: "pan-y" }}
+            className="md:hidden min-h-0 w-full overflow-hidden scrollbar-none"
+            style={{
+              touchAction: "pan-y",
+              height: "calc(var(--vvh) - 56px)", // 56px = h-14 navbar
+            }}
           >
             {!selectedChat ? <Mychats /> : <ChatBox />}
           </div>
