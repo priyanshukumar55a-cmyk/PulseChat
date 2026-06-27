@@ -14,7 +14,7 @@ const ChatPage = () => {
         <>
           {/* mobile */}
           <div
-            className="md:hidden h-[calc(100vh-3.5rem)] w-full overflow-y-hidden scrollbar-none"
+            className="md:hidden h-[calc(100dvh-3.5rem)] w-full overflow-y-hidden scrollbar-none"
             style={{ touchAction: "pan-y" }}
           >
             {!selectedChat ? <Mychats /> : <ChatBox />}
