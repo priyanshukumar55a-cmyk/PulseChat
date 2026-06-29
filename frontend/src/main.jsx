@@ -10,6 +10,8 @@ import Signup from "./Pages/Signup";
 import Settings from "./Pages/Settings";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
+import ResetPassword from "./Pages/ResetPassword";
+import ForgotPassword from "./Pages/ForgotPassword";
 
 const router = createBrowserRouter([
   {
@@ -29,6 +31,22 @@ const router = createBrowserRouter([
         element: (
           <PublicRoute>
             <Signup />
+          </PublicRoute>
+        ),
+      },
+      {
+        path: "reset-password/:token",
+        element: (
+          <PublicRoute>
+            <ResetPassword />
+          </PublicRoute>
+        ),
+      },
+      {
+        path: "forgot-password",
+        element: (
+          <PublicRoute>
+            <ForgotPassword />
           </PublicRoute>
         ),
       },

@@ -144,12 +144,13 @@ export default function Login() {
                   Remember me
                 </label>
 
-                <button
+                <Link
+                  to="/forgot-password"
                   type="button"
                   className="text-orange-400 hover:text-orange-300 font-medium hover:cursor-pointer"
                 >
                   Forgot Password?
-                </button>
+                </Link>
               </div>
 
               {/* Login Button */}
