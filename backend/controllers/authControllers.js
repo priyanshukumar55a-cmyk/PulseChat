@@ -84,15 +84,59 @@ const forgotPassword = async (req, res) => {
     email: user.email,
     subject: "Reset your PulseChat password",
     html: `
-    <h2>Password Reset</h2>
+  <div style="
+    max-width:600px;
+    margin:auto;
+    font-family:Arial,sans-serif;
+    padding:20px;
+    color:#333;
+  ">
+    <h1 style="text-align:center;">
+      PulseChat
+    </h1>
 
-    <p>Click below to reset your password:</p>
+    <h2>Password Reset Request</h2>
 
-    <a href="${resetUrl}">
-      Reset Password
-    </a>
+    <p>
+      We received a request to reset your PulseChat password.
+    </p>
 
-    <p>This link expires in 10 minutes.</p>
+    <p>
+      Click the button below to choose a new password:
+    </p>
+
+    <div style="text-align:center;margin:30px 0;">
+      <a
+        href="${resetUrl}"
+        style="
+          background:#4f46e5;
+          color:white;
+          padding:12px 24px;
+          text-decoration:none;
+          border-radius:8px;
+          display:inline-block;
+          font-weight:bold;
+        "
+      >
+        Reset Password
+      </a>
+    </div>
+
+    <p>
+      This link will expire in 10 minutes.
+    </p>
+
+    <p>
+      If you didn't request a password reset,
+      you can safely ignore this email.
+    </p>
+
+    <hr />
+
+    <p style="font-size:12px;color:#666;">
+      PulseChat Security Team
+    </p>
+  </div>
   `,
   });
 
