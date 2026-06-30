@@ -9,6 +9,15 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+// Verify connection when server starts
+transporter.verify((error, success) => {
+  if (error) {
+    console.error("❌ Mailer Error:", error);
+  } else {
+    console.log("✅ Mailer Ready");
+  }
+});
+
 const sendMail = async ({ email, subject, html }) => {
   try {
     const info = await transporter.sendMail({
@@ -18,8 +27,14 @@ const sendMail = async ({ email, subject, html }) => {
       html,
     });
 
+    console.log("✅ Email sent successfully");
+    console.log("Message ID:", info.messageId);
+    console.log("Accepted:", info.accepted);
+    console.log("Rejected:", info.rejected);
+
     return info;
   } catch (error) {
+    console.error("❌ Email sending failed");
     console.error(error);
 
     throw error;

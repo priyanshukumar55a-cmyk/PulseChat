@@ -6,7 +6,9 @@ const crypto = require("crypto");
 const sendMail = require("../utils/sendEmail");
 
 const registerUser = asyncHandler(async (req, res) => {
-  const { username, email, password } = req.body;
+  const username = req.body.username?.trim();
+  const email = req.body.email?.trim().toLowerCase();
+  const { password } = req.body;
 
   if (!username || !email || !password) {
     res.status(400);
@@ -55,7 +57,7 @@ const loginUser = asyncHandler(async (req, res) => {
   throw new Error("Invalid email or password");
 });
 
-const forgotPassword = async (req, res) => {
+const forgotPassword = asyncHandler(async (req, res) => {
   const email = req.body.email?.trim().toLowerCase();
 
   const user = await User.findOne({ email });
@@ -157,9 +159,9 @@ const forgotPassword = async (req, res) => {
   res.json({
     message: "Reset email sent",
   });
-};
+});
 
-const resetPassword = async (req, res) => {
+const resetPassword = asyncHandler(async (req, res) => {
   const { password } = req.body;
 
   const hashedToken = crypto
@@ -191,7 +193,7 @@ const resetPassword = async (req, res) => {
   res.json({
     message: "Password updated successfully",
   });
-};
+});
 
 module.exports = {
   registerUser,
