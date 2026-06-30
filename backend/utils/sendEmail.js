@@ -1,19 +1,21 @@
 require("dotenv").config();
-const { Resend } = require("resend");
+const nodemailer = require("nodemailer");
 
-const resend = new Resend(process.env.EMAIL_PASS);
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_APP_PASSWORD,
+  },
+});
 
 const sendMail = async ({ email, subject, html }) => {
-  const response = await resend.emails.send({
-    from: "onboarding@resend.dev",
+  await transporter.sendMail({
+    from: `PulseChat <${process.env.EMAIL_USER}>`,
     to: email,
     subject,
     html,
   });
-
-  console.log(response);
-
-  return response;
 };
 
 module.exports = sendMail;
