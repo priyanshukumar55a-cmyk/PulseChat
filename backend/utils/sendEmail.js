@@ -4,14 +4,14 @@ const nodemailer = require("nodemailer");
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_APP_PASSWORD,
+    user: process.env.EMAIL,
+    pass: process.env.EMAIL_PASS,
   },
 });
 
 const sendMail = async ({ email, subject, html }) => {
   await transporter.sendMail({
-    from: `PulseChat <${process.env.EMAIL_USER}>`,
+    from: `PulseChat <${process.env.EMAIL}>`,
     to: email,
     subject,
     html,
