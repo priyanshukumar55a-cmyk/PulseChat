@@ -84,14 +84,6 @@ const Settings = () => {
   return (
     <div className="h-full mt-20 px-4 py-8">
       <div className="max-w-2xl mx-auto space-y-6">
-        {/* <div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-400 via-purple-400 to-blue-400 bg-clip-text text-transparent">
-            Settings
-          </h1>
-          <p className="text-white/60 mt-2">
-            Manage your profile and preferences
-          </p>
-        </div> */}
 
         {/* Profile Settings Card */}
         <div className="bg-black/60 backdrop-blur-2xl border border-white/10 rounded-2xl p-8 space-y-6">
