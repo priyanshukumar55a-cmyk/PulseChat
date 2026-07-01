@@ -99,6 +99,17 @@ io.on("connection", (socket) => {
     });
   });
 
+  // for mesage read event
+  socket.on("messages read", ({ chatId }) => {
+    if (!chatId) return;
+
+    // broadcast to all users in the chat room that messages have been read
+    socket.in(chatId).emit("messages read update", {
+      chatId,
+      userId: socket.userId,
+    });
+  });
+
   socket.on("disconnect", () => {
     if (socket?.userId) {
       const count = activeUsers.get(socket.userId);

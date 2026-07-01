@@ -33,7 +33,7 @@ const SingleChat = forwardRef((props, ref) => {
   // =========================
 
   useEffect(() => {
-    if (!socket) return;
+    if (!socket || !selectedChat) return;
 
     const handleTyping = (payload) => {
       const room = payload?.room || payload;
@@ -45,6 +45,7 @@ const SingleChat = forwardRef((props, ref) => {
       if (!selectedChat || selectedChat._id !== room) return;
       setIsTyping(false);
     };
+
     const handleMessageReceived = async (newMessageReceived) => {
       if (!selectedChat || selectedChat._id !== newMessageReceived.chat._id) {
         return;
@@ -59,18 +60,42 @@ const SingleChat = forwardRef((props, ref) => {
       });
 
       try {
-        await api.post(`/message/read/${selectedChat._id}`);
+        if (document.visibilityState !== "visible") return;
+
+        await markChatAsRead(selectedChat._id);
       } catch (error) {}
+    };
+
+    const handleMessagesReadUpdate = ({ chatId, userId }) => {
+      if (!selectedChat || selectedChat._id !== chatId) return;
+      setMessages((prev) =>
+        prev.map((msg) => {
+          if (msg.chat._id !== chatId) return msg;
+
+          const alreadyRead = msg.readBy.some(
+            (id) => id.toString() === userId.toString(),
+          );
+
+          if (alreadyRead) return msg;
+
+          return {
+            ...msg,
+            readBy: [...msg.readBy, userId],
+          };
+        }),
+      );
     };
 
     socket.on("typing", handleTyping);
     socket.on("stop typing", handleStopTyping);
     socket.on("message received", handleMessageReceived);
+    socket.on("messages read update", handleMessagesReadUpdate);
 
     return () => {
       socket.off("typing", handleTyping);
       socket.off("stop typing", handleStopTyping);
       socket.off("message received", handleMessageReceived);
+      socket.off("messages read update", handleMessagesReadUpdate);
     };
   }, [socket, selectedChat]);
 
@@ -82,11 +107,23 @@ const SingleChat = forwardRef((props, ref) => {
     if (!selectedChat || !socketConnected) return;
 
     socket.emit("join chat", selectedChat._id);
+    markChatAsRead(selectedChat._id);
   }, [selectedChat, socketConnected]);
 
   // =========================
   // FETCH MESSAGES
   // =========================
+
+  const markChatAsRead = async (chatId) => {
+    if (!chatId) return;
+
+    try {
+      await api.post(`/message/read/${chatId}`);
+      socket?.emit("messages read", {
+        chatId,
+      });
+    } catch (error) {}
+  };
 
   const fetchMessages = async () => {
     if (!selectedChat) return;
@@ -97,8 +134,7 @@ const SingleChat = forwardRef((props, ref) => {
       const { data } = await api.get(`/message/${selectedChat._id}`);
 
       setMessages(data);
-
-      await api.post(`/message/read/${selectedChat._id}`);
+      await markChatAsRead(selectedChat._id);
     } catch (error) {
       toast.error("Failed to load messages");
     } finally {

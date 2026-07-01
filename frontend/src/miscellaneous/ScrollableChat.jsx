@@ -2,6 +2,7 @@ import React from "react";
 import { useAuth } from "@/context/AuthContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import defaultAvatar from "@/assets/default-avatar.png";
+import { CheckCheck } from "lucide-react";
 
 const ScrollableChat = ({ messages }) => {
   const { user } = useAuth();
@@ -18,6 +19,7 @@ const ScrollableChat = ({ messages }) => {
     return new Date(timestamp).toLocaleTimeString([], {
       hour: "2-digit",
       minute: "2-digit",
+      hour12: true,
     });
   };
 
@@ -42,6 +44,11 @@ const ScrollableChat = ({ messages }) => {
       {messages &&
         messages.map((m, i) => {
           const isSender = m.sender._id === user._id;
+          const isRead =
+            isSender &&
+            m.readBy &&
+            m.chat?.users &&
+            m.readBy.length >= m.chat.users.length;
           const shouldShowAvatar =
             !isSender &&
             (i === messages.length - 1 ||
@@ -97,9 +104,18 @@ const ScrollableChat = ({ messages }) => {
                   </div>
 
                   {isLastInGroup && (
-                    <span className="text-xs mt-1 opacity-70 px-1">
-                      {formatTime(m.createdAt)}
-                    </span>
+                    <div className="flex items-center gap-1 mt-1 text-xs opacity-80 px-1">
+                      <span>{formatTime(m.createdAt)}</span>
+
+                      {isSender && (
+                        <CheckCheck
+                          size={16}
+                          className={
+                            isRead ? "text-orange-500" : "text-white/40"
+                          }
+                        />
+                      )}
+                    </div>
                   )}
                 </div>
               </div>

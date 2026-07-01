@@ -42,7 +42,13 @@ const allMessage = expressAsyncHandler(async (req, res) => {
     const messages = await Message.find({ chat: req.params.chatId })
       .sort({ createdAt: 1 })
       .populate("sender", "username pic email")
-      .populate("chat");
+      .populate({
+        path: "chat",
+        populate: {
+          path: "users",
+          select: "username pic email",
+        },
+      });
 
     res.json(messages);
   } catch (error) {
