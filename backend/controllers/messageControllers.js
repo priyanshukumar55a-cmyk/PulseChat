@@ -40,6 +40,7 @@ const sendMessage = expressAsyncHandler(async (req, res) => {
 const allMessage = expressAsyncHandler(async (req, res) => {
   try {
     const messages = await Message.find({ chat: req.params.chatId })
+      .sort({ createdAt: 1 })
       .populate("sender", "username pic email")
       .populate("chat");
 

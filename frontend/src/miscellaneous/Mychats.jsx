@@ -13,7 +13,7 @@ import SearchBox from "@/components/navbar/SearchBox";
 const Mychats = () => {
   const { isAuthenticated } = useAuth();
   const [loading, setLoading] = useState(false);
-  const { chats, setChats, selectedChat, setSelectedChat } = ChatState();
+  const { chats, setChats, selectedChat, setSelectedChat, notifications } = ChatState();
   const [open, setOpen] = useState(false);
   const { user } = useAuth();
 
@@ -33,7 +33,7 @@ const Mychats = () => {
     api.post(`/message/read/${selectedChat._id}`);
 
     fetchChats();
-  }, [selectedChat]);
+  }, [selectedChat, notifications]);
 
   useEffect(() => {
     fetchChats();

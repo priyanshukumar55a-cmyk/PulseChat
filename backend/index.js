@@ -77,11 +77,15 @@ io.on("connection", (socket) => {
     socket.join(room);
   });
 
-  socket.on("typing", (room) => {
-    socket.in(room).emit("typing");
+  socket.on("typing", (payload) => {
+    const room = payload?.room || payload;
+    if (!room) return;
+    socket.in(room).emit("typing", { room });
   });
-  socket.on("stop typing", (room) => {
-    socket.in(room).emit("stop typing");
+  socket.on("stop typing", (payload) => {
+    const room = payload?.room || payload;
+    if (!room) return;
+    socket.in(room).emit("stop typing", { room });
   });
 
   socket.on("new message", (newMessageReceived) => {

@@ -35,8 +35,16 @@ const SingleChat = forwardRef((props, ref) => {
   useEffect(() => {
     if (!socket) return;
 
-    const handleTyping = () => setIsTyping(true);
-    const handleStopTyping = () => setIsTyping(false);
+    const handleTyping = (payload) => {
+      const room = payload?.room || payload;
+      if (!selectedChat || selectedChat._id !== room) return;
+      setIsTyping(true);
+    };
+    const handleStopTyping = (payload) => {
+      const room = payload?.room || payload;
+      if (!selectedChat || selectedChat._id !== room) return;
+      setIsTyping(false);
+    };
     const handleMessageReceived = async (newMessageReceived) => {
       if (!selectedChat || selectedChat._id !== newMessageReceived.chat._id) {
         return;
@@ -129,7 +137,7 @@ const SingleChat = forwardRef((props, ref) => {
 
     try {
       if (typingRef.current) {
-        socket.emit("stop typing", selectedChat._id);
+        socket.emit("stop typing", { room: selectedChat._id });
 
         typingRef.current = false;
 
@@ -165,13 +173,13 @@ const SingleChat = forwardRef((props, ref) => {
     if (!typingRef.current) {
       typingRef.current = true;
 
-      socket.emit("typing", selectedChat._id);
+      socket.emit("typing", { room: selectedChat._id });
     }
 
     clearTimeout(typingTimeoutRef.current);
 
     typingTimeoutRef.current = setTimeout(() => {
-      socket.emit("stop typing", selectedChat._id);
+      socket.emit("stop typing", { room: selectedChat._id });
 
       typingRef.current = false;
     }, 2000);
