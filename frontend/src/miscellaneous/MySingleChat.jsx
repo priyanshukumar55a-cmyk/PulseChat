@@ -15,19 +15,19 @@ const MySingleChat = ({ chat, user, isSelected, setSelectedChat }) => {
     ? chat.chatName
     : otherUser?.username || chat.chatName || "Unknown";
 
-    const senderPrefix = latestMsg?.sender?.username
-      ? chat?.latestMessage?.sender._id === user._id
-        ? "You: "
-        : chat?.isGroupChat
-          ? `${chat?.latestMessage?.sender.username}: `
-          : ""
-      : "";
+  const senderPrefix = latestMsg?.sender?.username
+    ? chat?.latestMessage?.sender._id === user._id
+      ? "You: "
+      : chat?.isGroupChat
+        ? `${chat?.latestMessage?.sender.username}: `
+        : ""
+    : "";
 
-    const preview = chat?.latestMessage
-      ? `${senderPrefix}${chat?.latestMessage?.content.slice(0, 40)}${
-          chat?.latestMessage?.content.length > 40 ? "..." : ""
-        }`
-      : "No messages yet";
+  const preview = chat?.latestMessage
+    ? `${senderPrefix}${chat?.latestMessage?.content.slice(0, 40)}${
+        chat?.latestMessage?.content.length > 40 ? "..." : ""
+      }`
+    : "No messages yet";
 
   return (
     <button
@@ -66,12 +66,30 @@ const MySingleChat = ({ chat, user, isSelected, setSelectedChat }) => {
           >
             {grpName}
           </p>
+
+          {chat.unreadCount > 0 && (
+            <span
+              className={`
+        min-w-5 h-5 px-1
+        rounded-full
+        flex items-center justify-center
+        text-[11px] font-semibold
+        ${isSelected ? "bg-white text-violet-600" : "bg-fuchsia-500 text-white"}
+      `}
+            >
+              {chat.unreadCount > 99 ? "99+" : chat.unreadCount}
+            </span>
+          )}
         </div>
 
         <div className="flex items-center gap-2 mt-1">
           <p
             className={`text-sm truncate ${
-              isSelected ? "text-violet-100" : "text-slate-400"
+              isSelected
+                ? "text-violet-100"
+                : chat.unreadCount > 0
+                  ? "text-white font-medium"
+                  : "text-slate-400"
             }`}
           >
             {preview}

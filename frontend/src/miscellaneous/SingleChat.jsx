@@ -37,7 +37,7 @@ const SingleChat = forwardRef((props, ref) => {
 
     const handleTyping = () => setIsTyping(true);
     const handleStopTyping = () => setIsTyping(false);
-    const handleMessageReceived = (newMessageReceived) => {
+    const handleMessageReceived = async (newMessageReceived) => {
       if (!selectedChat || selectedChat._id !== newMessageReceived.chat._id) {
         return;
       }
@@ -49,6 +49,10 @@ const SingleChat = forwardRef((props, ref) => {
 
         return [...prev, newMessageReceived];
       });
+
+      try {
+        await api.post(`/message/read/${selectedChat._id}`);
+      } catch (error) {}
     };
 
     socket.on("typing", handleTyping);
@@ -85,6 +89,8 @@ const SingleChat = forwardRef((props, ref) => {
       const { data } = await api.get(`/message/${selectedChat._id}`);
 
       setMessages(data);
+
+      await api.post(`/message/read/${selectedChat._id}`);
     } catch (error) {
       toast.error("Failed to load messages");
     } finally {

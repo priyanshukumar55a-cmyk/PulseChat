@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const Chat = require("../models/chatModel");
 const User = require("../models/userModel");
+const Message = require("../models/messageModel");
 
 const accessChat = asyncHandler(async (req, res) => {
   const { userId } = req.body;
@@ -50,7 +51,7 @@ const accessChat = asyncHandler(async (req, res) => {
 });
 
 const fetchChats = asyncHandler(async (req, res) => {
-  let results = await Chat.find({
+  let chats = await Chat.find({
     users: { $elemMatch: { $eq: req.user._id } },
   })
     .populate("users", "-password")
@@ -58,12 +59,27 @@ const fetchChats = asyncHandler(async (req, res) => {
     .populate("latestMessage")
     .sort({ updatedAt: -1 });
 
-  results = await User.populate(results, {
+  chats = await User.populate(chats, {
     path: "latestMessage.sender",
     select: "username email",
   });
 
-  res.status(200).json(results);
+  const chatsWithUnreadCount = await Promise.all(
+    chats.map(async (chat) => {
+      const unreadCount = await Message.countDocuments({
+        chat: chat._id,
+        sender: { $ne: req.user._id },
+        readBy: { $ne: req.user._id },
+      });
+
+      return {
+        ...chat.toObject(),
+        unreadCount,
+      }
+    })
+  )
+
+  res.status(200).json(chatsWithUnreadCount);
 });
 
 const createGroupChat = asyncHandler(async (req, res) => {

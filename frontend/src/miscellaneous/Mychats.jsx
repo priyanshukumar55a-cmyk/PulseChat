@@ -28,6 +28,12 @@ const Mychats = () => {
       setLoading(false);
     }
   };
+  useEffect(() => {
+    if (!selectedChat) return;
+    api.post(`/message/read/${selectedChat._id}`);
+
+    fetchChats();
+  }, [selectedChat]);
 
   useEffect(() => {
     fetchChats();

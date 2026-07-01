@@ -4,47 +4,71 @@ const User = require("../models/userModel");
 const Chat = require("../models/chatModel");
 
 const sendMessage = expressAsyncHandler(async (req, res) => {
-    const { content, chatId } = req.body;
+  const { content, chatId } = req.body;
 
-    if (!content || !chatId) {
-        res.status(400)
-        throw new Error("Invalid data passed into request")
-    }
+  if (!content || !chatId) {
+    res.status(400);
+    throw new Error("Invalid data passed into request");
+  }
 
-    var newMessage = {
-        sender: req.user._id,
-        content: content,
-        chat: chatId,
-    }
+  var newMessage = {
+    sender: req.user._id,
+    content: content,
+    chat: chatId,
+    readBy: [req.user._id],
+  };
 
-    try {
-        var message = await Message.create(newMessage);
-        message = await message.populate("sender","username pic" )
-        message = await message.populate("chat")
-        message = await User.populate(message, {
-            path: 'chat.users',
-            select: 'username pic email',
-        })
+  try {
+    var message = await Message.create(newMessage);
+    message = await message.populate("sender", "username pic");
+    message = await message.populate("chat");
+    message = await User.populate(message, {
+      path: "chat.users",
+      select: "username pic email",
+    });
 
-        await Chat.findByIdAndUpdate(req.body.chatId, {
-            latestMessage: message,
-        })
-        res.json(message)
-    } catch (error) {
-        res.status(400);
-        throw new Error(error.message)
-    }
-})
+    await Chat.findByIdAndUpdate(req.body.chatId, {
+      latestMessage: message,
+    });
+    res.json(message);
+  } catch (error) {
+    res.status(400);
+    throw new Error(error.message);
+  }
+});
 
 const allMessage = expressAsyncHandler(async (req, res) => {
-    try {
-        const messages = await Message.find({ chat: req.params.chatId }).populate("sender", "name pic email").populate("chat")
-        
-        res.json(messages)
-    } catch (error) {
-        res.status(400);
-        throw new Error(error.message);
-    }
-})
+  try {
+    const messages = await Message.find({ chat: req.params.chatId })
+      .populate("sender", "username pic email")
+      .populate("chat");
 
-module.exports = { sendMessage, allMessage };
+    res.json(messages);
+  } catch (error) {
+    res.status(400);
+    throw new Error(error.message);
+  }
+});
+
+const markMessagesAsRead = expressAsyncHandler(async (req, res) => {
+  const { chatId } = req.params;
+
+  await Message.updateMany(
+    {
+      chat: chatId,
+      sender: { $ne: req.user._id },
+      readBy: {
+        $ne: req.user._id,
+      },
+    },
+    {
+      $addToSet: {
+        readBy: req.user._id,
+      },
+    },
+  );
+
+  res.sendStatus(200);
+});
+
+module.exports = { sendMessage, allMessage, markMessagesAsRead };
