@@ -45,8 +45,33 @@ const ChatProvider = ({ children }) => {
 
     socket.on("message received", handleMessageReceived);
 
+    const handleMessagesReadUpdate = ({ chatId, userId }) => {
+      setChats((prev) =>
+        prev.map((chat) => {
+          if (chat._id !== chatId || !chat.latestMessage) return chat;
+
+          const alreadyRead = chat.latestMessage.readBy?.some(
+            (id) => id.toString() === userId.toString(),
+          );
+
+          if (alreadyRead) return chat;
+
+          return {
+            ...chat,
+            latestMessage: {
+              ...chat.latestMessage,
+              readBy: [...(chat.latestMessage.readBy || []), userId],
+            },
+          };
+        }),
+      );
+    };
+
+    socket.on("messages read update", handleMessagesReadUpdate);
+
     return () => {
       socket.off("message received", handleMessageReceived);
+      socket.off("messages read update", handleMessagesReadUpdate);
     };
   }, [socket, selectedChat]);
 

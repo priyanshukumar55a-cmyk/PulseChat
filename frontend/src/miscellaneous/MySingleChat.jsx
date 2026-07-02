@@ -1,27 +1,32 @@
 import { useSocket } from "@/context/SocketProvider";
+import { CheckCheck } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
 const MySingleChat = ({ chat, user, isSelected, setSelectedChat }) => {
   const { activeUsers } = useSocket();
-  const [latestMsg, setLatestMsg] = useState(chat.latestMessage);
-
-  useEffect(() => setLatestMsg(chat.latestMessage), [chat.latestMessage]);
+  const latestMsg = chat.latestMessage;
 
   const otherUser =
     !chat.isGroupChat && chat.users?.find((u) => u._id !== user?._id);
-  const isOnline = activeUsers.includes(otherUser?._id);
+  const isOnline = activeUsers?.includes(otherUser?._id);
 
   const grpName = chat.isGroupChat
     ? chat.chatName
     : otherUser?.username || chat.chatName || "Unknown";
 
-  const senderPrefix = latestMsg?.sender?.username
-    ? chat?.latestMessage?.sender._id === user._id
-      ? "You: "
-      : chat?.isGroupChat
-        ? `${chat?.latestMessage?.sender.username}: `
-        : ""
-    : "";
+  const isSender = latestMsg?.sender?._id === user._id;
+  const participantCount =
+    chat?.users?.length ?? latestMsg?.chat?.users?.length ?? 0;
+  const isRead =
+    Boolean(isSender && latestMsg?.readBy && participantCount > 0) &&
+    latestMsg?.readBy?.length >= participantCount;
+
+  const senderPrefix =
+    latestMsg?.sender?.username &&
+    chat?.latestMessage?.sender?._id !== user?._id &&
+    chat?.isGroupChat
+      ? `${chat.latestMessage.sender.username}: `
+      : "";
 
   const preview = chat?.latestMessage
     ? `${senderPrefix}${chat?.latestMessage?.content.slice(0, 40)}${
@@ -83,6 +88,12 @@ const MySingleChat = ({ chat, user, isSelected, setSelectedChat }) => {
         </div>
 
         <div className="flex items-center gap-2 mt-1">
+          {isSender && (
+            <CheckCheck
+              size={16}
+              className={isRead ? "text-orange-500" : "text-white/40"}
+            />
+          )}
           <p
             className={`text-sm truncate ${
               isSelected

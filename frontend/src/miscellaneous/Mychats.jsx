@@ -32,8 +32,7 @@ const Mychats = () => {
     if (!selectedChat) return;
     api.post(`/message/read/${selectedChat._id}`);
 
-    fetchChats();
-  }, [selectedChat, notifications]);
+  }, [selectedChat]);
 
   useEffect(() => {
     fetchChats();

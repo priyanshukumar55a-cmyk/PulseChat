@@ -43,21 +43,21 @@ const ScrollableChat = ({ messages }) => {
     <>
       {messages &&
         messages.map((m, i) => {
-          const isSender = m.sender._id === user._id;
+          const isSender = m.sender?._id === user?._id;
           const isRead =
             isSender &&
             m.readBy &&
             m.chat?.users &&
-            m.readBy.length >= m.chat.users.length;
+            m.readBy?.length >= m.chat?.users?.length;
           const shouldShowAvatar =
             !isSender &&
             (i === messages.length - 1 ||
-              messages[i + 1]?.sender?._id !== m.sender._id);
+              messages[i + 1]?.sender?._id !== m.sender?._id);
           const sameSenderAsPrev =
-            i > 0 && messages[i - 1].sender._id === m.sender._id;
+            i > 0 && messages[i - 1]?.sender?._id === m.sender?._id;
           const isLastInGroup =
             i === messages.length - 1 ||
-            messages[i + 1].sender._id !== m.sender._id;
+            messages[i + 1]?.sender?._id !== m.sender?._id;
 
           return (
             <React.Fragment key={m._id}>

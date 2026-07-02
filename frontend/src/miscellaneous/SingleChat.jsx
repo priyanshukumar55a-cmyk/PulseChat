@@ -16,7 +16,7 @@ import { useSocket } from "@/context/SocketProvider";
 
 const SingleChat = forwardRef((props, ref) => {
   const { socket, connected } = useSocket();
-  const { selectedChat } = ChatState();
+  const { selectedChat, setChats } = ChatState();
 
   const chatContainerRef = useRef(null);
   const typingTimeoutRef = useRef(null);
@@ -190,6 +190,22 @@ const SingleChat = forwardRef((props, ref) => {
       });
 
       setMessages((prev) => [...prev, data]);
+
+      setChats((prev) => {
+        const currentChat = prev.find((chat) => chat._id === data.chat._id);
+
+        if (!currentChat) return prev;
+
+        const updatedChat = {
+          ...currentChat,
+          latestMessage: data,
+        };
+
+        return [
+          updatedChat,
+          ...prev.filter((chat) => chat._id !== data.chat._id),
+        ];
+      });
 
       socket.emit("new message", data);
     } catch (error) {
