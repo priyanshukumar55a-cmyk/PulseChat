@@ -282,20 +282,20 @@ export default function Signup() {
               </button>
 
               {/* Divider */}
-              <div className="flex items-center gap-3 md:col-span-2">
+              {/* <div className="flex items-center gap-3 md:col-span-2">
                 <div className="h-px flex-1 bg-white/20" />
                 <span className="text-white/50 text-sm">or</span>
                 <div className="h-px flex-1 bg-white/20" />
-              </div>
+              </div> */}
 
               {/* Google Signup */}
-              <button
+              {/* <button
                 type="button"
                 className="w-full md:col-span-2 py-2 rounded-xl bg-white/10 border border-white/20 text-white flex items-center justify-center gap-3 hover:bg-white/15 transition-all duration-300 hover:cursor-pointer"
               >
                 <FcGoogle className="text-xl" />
                 Continue with Google
-              </button>
+              </button> */}
             </form>
 
             {/* Footer */}

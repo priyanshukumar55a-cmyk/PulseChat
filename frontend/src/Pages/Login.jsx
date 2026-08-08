@@ -170,20 +170,20 @@ export default function Login() {
               </button>
 
               {/* Divider */}
-              <div className="flex items-center gap-3">
+              {/* <div className="flex items-center gap-3">
                 <div className="h-px flex-1 bg-white/20" />
                 <span className="text-white/50 text-sm">or</span>
                 <div className="h-px flex-1 bg-white/20" />
-              </div>
+              </div> */}
 
               {/* Google Login */}
-              <button
+              {/* <button
                 type="button"
                 className="w-full py-2 rounded-xl bg-white/10 border border-white/20 text-white hover:bg-white/15 transition hover:cursor-pointer flex items-center justify-center gap-2"
               >
                 <FcGoogle className="w-5 h-5" />
                 Continue with Google
-              </button>
+              </button> */}
             </form>
 
             {/* Footer */}
